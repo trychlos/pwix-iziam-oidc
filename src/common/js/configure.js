@@ -2,6 +2,12 @@
  * pwix:package-template/src/common/js/configure.js
  */
 
+import merge from 'merge';
+
+pckTemplate._defaults = {
+    verbosity: PCK_VERBOSE_NONE
+};
+
 pckTemplate.configure = function( o ){
     pckTemplate._conf = merge.recursive( true, pckTemplate._defaults, o );
 
@@ -10,3 +16,5 @@ pckTemplate.configure = function( o ){
         console.debug( 'pwix:package-template configure() with', o, 'building', pckTemplate._conf );
     }
 }
+
+pckTemplate._conf = merge.recursive( true, pckTemplate._defaults );

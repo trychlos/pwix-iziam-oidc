@@ -10,6 +10,7 @@ if( false ){
 }
 
 checkNpmVersions({
+    'merge': '^2.1.1'
 },
     'pwix:package-template'
 );
