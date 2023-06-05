@@ -2,10 +2,12 @@
 
 ## ChangeLog
 
-| Version | Release    | Content |
-| ---:    | :---       | :---    |
-| xxx   |  | xxx | Initial release |
+### 1.0.0
+
+Release date: xxxxx
+
+- Initial release
 
 ---
 P. Wieser
-- Last updated on 2023, May 11th
+- Last updated on 2023, June 5th
