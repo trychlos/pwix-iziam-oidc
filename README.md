@@ -1,11 +1,5 @@
 # package-template
 
-Changes:
-- package-template  package-name
-- pck-template      exported-object + git mv src/common/js/pck-template.js src/common/js/exported-object.js
-- pckTemplate       exportedObject
-- PCK_              PREFIX_
-
 ## What is it ?
 
 A Meteor package template.
