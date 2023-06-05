@@ -1,10 +1,10 @@
 # package-template
 
 Changes:
-- package-template  labels
-- pck-template      basename
-- pckTemplate       labels
-- PCK_              labels
+- package-template  package-name
+- pck-template      exported-object + git mv src/common/js/pck-template.js src/common/js/exported-object.js
+- pckTemplate       exportedObject
+- PCK_              PREFIX_
 
 ## What is it ?
 
@@ -61,4 +61,4 @@ Because this is dynamically done on a per dialog basis, and only on the caller r
 
 ---
 P. Wieser
-- Last updated on 2023, May 11th
+- Last updated on 2023, June 5th
