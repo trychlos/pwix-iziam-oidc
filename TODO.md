@@ -1,4 +1,4 @@
-# package-template - TODO
+# pwix:package-template - TODO
 
 ## Summary
 

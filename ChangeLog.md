@@ -1,4 +1,4 @@
-# package-template
+# pwix:package-template
 
 ## ChangeLog
 
