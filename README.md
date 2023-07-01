@@ -11,7 +11,7 @@ It materializes our design decisions about user interface:
 
 ## Configuration
 
-The package's behavior can be configured through a call to the `pckTemplate.configure()` method, with just a single javascript object argument, which itself should only contains the options you want override.
+The package's behavior can be configured through a call to the `uiCore.configure()` method, with just a single javascript object argument, which itself should only contains the options you want override.
 
 Known configuration options are:
 
@@ -27,11 +27,11 @@ Known configuration options are:
 
     - `PCK_VERBOSE_CONFIGURE`
 
-        Trace `pckTemplate.configure()` calls and their result
+        Trace `uiCore.configure()` calls and their result
 
-Please note that `pckTemplate.configure()` method should be called in the same terms both in client and server sides.
+Please note that `uiCore.configure()` method should be called in the same terms both in client and server sides.
 
-Remind too that Meteor packages are instanciated at application level. They are so only configurable once, or, in other words, only one instance has to be or can be configured. Addtionnal calls to `pckTemplate.configure()` will just override the previous one. You have been warned: **only the application should configure a package**.
+Remind too that Meteor packages are instanciated at application level. They are so only configurable once, or, in other words, only one instance has to be or can be configured. Addtionnal calls to `uiCore.configure()` will just override the previous one. You have been warned: **only the application should configure a package**.
 
 ## NPM peer dependencies
 
