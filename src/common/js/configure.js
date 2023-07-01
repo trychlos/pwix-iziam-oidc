@@ -1,5 +1,5 @@
 /*
- * pwix:package-template/src/common/js/configure.js
+ * pwix:core-ui/src/common/js/configure.js
  */
 
 import merge from 'merge';
@@ -13,7 +13,7 @@ pckTemplate.configure = function( o ){
 
     // be verbose if asked for
     if( pckTemplate._conf.verbosity & PCK_VERBOSE_CONFIGURE ){
-        console.debug( 'pwix:package-template configure() with', o, 'building', pckTemplate._conf );
+        console.debug( 'pwix:core-ui configure() with', o, 'building', pckTemplate._conf );
     }
 }
 

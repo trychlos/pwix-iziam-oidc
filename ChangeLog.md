@@ -1,4 +1,4 @@
-# pwix:package-template
+# pwix:core-ui
 
 ## ChangeLog
 

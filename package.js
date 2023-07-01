@@ -1,5 +1,5 @@
 Package.describe({
-    name: 'pwix:package-template',
+    name: 'pwix:core-ui',
     version: '0.0.1',
     // Brief, one-line summary of the package.
     summary: '',
@@ -24,7 +24,7 @@ Package.onUse( function( api ){
 Package.onTest( function( api ){
     configure( api );
     api.use( 'tinytest' );
-    api.use( 'pwix:package-template' );
+    api.use( 'pwix:core-ui' );
     api.mainModule( 'test/js/index.js' );
 });
 

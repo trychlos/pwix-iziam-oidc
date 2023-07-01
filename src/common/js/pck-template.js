@@ -1,5 +1,5 @@
 /*
- * pwix:package-template/src/common/js/pck-template.js
+ * pwix:core-ui/src/common/js/pck-template.js
  */
 
 pckTemplate = {};
