@@ -1,4 +1,4 @@
-# pwix:core-ui
+# pwix:ui-core
 
 ## What is it ?
 
@@ -50,11 +50,11 @@ Each of these dependencies should be installed at application level:
 
 ## Translations
 
-New and updated translations are willingly accepted, and more than welcome. Just be kind enough to submit a PR on the [Github repository](https://github.com/trychlos/pwix-core-ui/pulls).
+New and updated translations are willingly accepted, and more than welcome. Just be kind enough to submit a PR on the [Github repository](https://github.com/trychlos/pwix-ui-core/pulls).
 
 ## Cookies and comparable technologies
 
-`pwix:core-ui` may use `localStorage` to record ...
+`pwix:ui-core` may use `localStorage` to record ...
 
 Because this is dynamically done on a per dialog basis, and only on the caller request, the package doesn't advertize of this use, relying on the caller own declaration.
 

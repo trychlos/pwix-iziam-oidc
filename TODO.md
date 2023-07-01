@@ -1,4 +1,4 @@
-# pwix:core-ui - TODO
+# pwix:ui-core - TODO
 
 ## Summary
 
