@@ -21,11 +21,11 @@ Known configuration options are:
 
     The accepted value can be any or-ed combination of following:
 
-    - `PCK_VERBOSE_NONE`
+    - `PCC_VERBOSE_NONE`
 
         Do not display any trace log to the console
 
-    - `PCK_VERBOSE_CONFIGURE`
+    - `PCC_VERBOSE_CONFIGURE`
 
         Trace `uiCore.configure()` calls and their result
 

@@ -5,14 +5,14 @@
 import merge from 'merge';
 
 uiCore._defaults = {
-    verbosity: PCK_VERBOSE_NONE
+    verbosity: PCC_VERBOSE_NONE
 };
 
 uiCore.configure = function( o ){
     uiCore._conf = merge.recursive( true, uiCore._defaults, o );
 
     // be verbose if asked for
-    if( uiCore._conf.verbosity & PCK_VERBOSE_CONFIGURE ){
+    if( uiCore._conf.verbosity & PCC_VERBOSE_CONFIGURE ){
         console.debug( 'pwix:ui-core configure() with', o, 'building', uiCore._conf );
     }
 }

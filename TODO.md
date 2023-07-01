@@ -10,7 +10,6 @@
 
 |   Id | Date       | Description and comment(s) |
 | ---: | :---       | :---                       |
-|    4 | 2023- 6- 5 | Change PCK_ to PREFIX_ |
 |    5 |  |  |
 
 ---
@@ -24,6 +23,8 @@
 |      | 2023- 7- 1 | cancelled |
 |    3 | 2023- 6- 5 | Change pckTemplate to exportedObject |
 |      | 2023- 7- 1 | done to uiCore |
+|    4 | 2023- 6- 5 | Change PCK_ to PREFIX_ |
+|      | 2023- 7- 1 | done to PCC_ as pwix client core |
 
 ---
 P. Wieser

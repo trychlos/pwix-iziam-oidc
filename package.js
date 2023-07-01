@@ -14,8 +14,8 @@ Package.onUse( function( api ){
     configure( api );
     api.export([
         'uiCore',
-        'PCK_VERBOSE_NONE',
-        'PCK_VERBOSE_CONFIGURE'
+        'PCC_VERBOSE_NONE',
+        'PCC_VERBOSE_CONFIGURE'
     ]);
     api.mainModule( 'src/client/js/index.js', 'client' );
     api.mainModule( 'src/server/js/index.js', 'server' );
