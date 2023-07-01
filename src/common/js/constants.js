@@ -1,5 +1,5 @@
 /*
- * pwix:ui-core/src/common/js/constants.js
+ * pwix:core-ui/src/common/js/constants.js
  */
 
 PCC_VERBOSE_NONE = 0;

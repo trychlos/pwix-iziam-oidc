@@ -1,5 +1,5 @@
 /*
- * pwix:ui-core/src/common/js/global.js
+ * pwix:core-ui/src/common/js/global.js
  */
 
 uiCore = {

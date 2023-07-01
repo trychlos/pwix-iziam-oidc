@@ -1,5 +1,5 @@
 /*
- * pwix:ui-core/src/common/js/configure.js
+ * pwix:core-ui/src/common/js/configure.js
  */
 
 import _ from 'lodash';
@@ -19,7 +19,7 @@ uiCore.configure = function( o ){
         _.merge( uiCore._conf, uiCore._defaults, o );
         // be verbose if asked for
         if( uiCore._conf.verbosity & PCC_VERBOSE_CONFIGURE ){
-            console.log( 'pwix:ui-core configure() with', o, 'building', uiCore._conf );
+            console.log( 'pwix:core-ui configure() with', o, 'building', uiCore._conf );
         }
     }
     // also acts as a getter

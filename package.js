@@ -1,5 +1,5 @@
 Package.describe({
-    name: 'pwix:ui-core',
+    name: 'pwix:core-ui',
     version: '0.1.0',
     // Brief, one-line summary of the package.
     summary: '',
@@ -25,7 +25,7 @@ Package.onUse( function( api ){
 Package.onTest( function( api ){
     configure( api );
     api.use( 'tinytest' );
-    api.use( 'pwix:ui-core' );
+    api.use( 'pwix:core-ui' );
     api.mainModule( 'test/js/index.js' );
 });
 

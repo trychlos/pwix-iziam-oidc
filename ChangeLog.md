@@ -1,4 +1,4 @@
-# pwix:ui-core
+# pwix:core-ui
 
 ## ChangeLog
 
