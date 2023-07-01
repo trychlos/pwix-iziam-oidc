@@ -4,7 +4,7 @@
 
 ### 1.0.0
 
-Release date: xxxxx
+Release date: 
 
 - Initial release
 

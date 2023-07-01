@@ -2,8 +2,7 @@
  * pwix:core-ui/src/common/js/index.js
  */
 
-import './pck-tempkate.js';
-//
+import './global.js';
 import './constants.js';
 //
 import './configure.js';

@@ -2,7 +2,12 @@
 
 ## What is it ?
 
-A Meteor package template.
+A Meteor package which embeds our UI initializations. THIS PACKAGE IS NOT THOUGHT TO BE PUBLISHED.
+
+It materializes our design decisions about user interface:
+
+- deep copy, deep equal and other Object functions are handled by lodash, and check_npms takes care of requiring it
+- it is Bootstrap-based, so check_npms takes care of requiring @popperjs/core and bootstrap
 
 ## Configuration
 
@@ -34,7 +39,7 @@ Starting with v 1.1.0, and in accordance with advices from [the Meteor Guide](ht
 
 Instead we check npm versions of installed packages at runtime, on server startup, in development environment.
 
-Dependencies as of v 1.0.0:
+Dependencies as of v 0.1.0:
 ```
 ```
 
