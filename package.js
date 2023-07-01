@@ -19,6 +19,7 @@ Package.onUse( function( api ){
     ]);
     api.mainModule( 'src/client/js/index.js', 'client' );
     api.mainModule( 'src/server/js/index.js', 'server' );
+    api.addFiles( 'src/client/stylesheets/reset.less', 'client', { isImport: true });
 });
 
 Package.onTest( function( api ){
