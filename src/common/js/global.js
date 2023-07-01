@@ -2,4 +2,7 @@
  * pwix:ui-core/src/common/js/global.js
  */
 
-uiCore = {};
+uiCore = {
+    // configuration
+    _conf: {}
+};
