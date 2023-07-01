@@ -8,6 +8,7 @@ It materializes our design decisions about user interface:
 
 - deep copy, deep equal and other Object functions are handled by lodash, and check_npms takes care of requiring it
 - it is Bootstrap-based, so check_npms takes care of requiring @popperjs/core and bootstrap
+- embeds (and provides) latest FontAwesome copy
 
 ## Configuration
 
