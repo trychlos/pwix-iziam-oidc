@@ -1,0 +1,102 @@
+/*
+ * pwix:core-ui/src/client/stylesheets/_layout.less
+ *
+ * Positioning utilities
+ * All layouts should have their topmost div have this 'x-layout' class
+ */
+
+@import "{pwix:layout}/src/client/css/ui_layout.scss";
+
+.x-layout {
+    .x-nowrap {
+        white-space: nowrap;
+    }
+    .x-center {
+        text-align: center;
+    }
+    .x-italic {
+        font-style: italic;
+    }
+    .x-left {
+        text-align: left;
+    }
+    /*
+    .x-mb1 {
+        margin-bottom: 1em;
+    }
+    .x-ml05 {
+        margin-left: 0.5em;
+    }
+    .x-ml1 {
+        margin-left: 1em;
+    }
+    .x-ml2 {
+        margin-left: 2em;
+    }
+    .x-ml4 {
+        margin-left: 4em;
+    }
+    .x-mr05 {
+        margin-right: 0.5em;
+    }
+    .x-mr1 {
+        margin-right: 1em;
+    }
+    .x-mr4 {
+        margin-right: 4em;
+    }
+    .x-mt1 {
+        margin-top: 1em;
+    }
+    .x-mt2 {
+        margin-top: 2em;
+    }
+    .x-mt5 {
+        margin-top: 5em;
+    }
+    .x-pl05 {
+        padding-left: 0.5em;
+    }
+    .x-pl1 {
+        padding-left: 1em;
+    }
+    .x-pr05 {
+        padding-right: 0.5em;
+    }
+    */
+    .x-right {
+        text-align: right;
+    }
+    /*
+    .x-w2 {
+        width: 2em;
+    }
+    .x-w10 {
+        width: 10%;
+    }
+    .x-w15 {
+        width: 15%;
+    }
+    .x-w17 {
+        width: 17%;
+    }
+    .x-w25 {
+        width: 25%;
+    }
+    .x-w33 {
+        width: 33.4%;
+    }
+    .x-w37 {
+        width: 37%;
+    }
+    .x-w50 {
+        width: 50%;
+    }
+    .x-w80 {
+        width: 100%;
+    }
+    */
+    .x-w100 {
+        width: 100%;
+    }
+}

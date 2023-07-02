@@ -17,7 +17,7 @@ Package.onUse( function( api ){
     ]);
     api.mainModule( 'src/client/js/index.js', 'client' );
     api.mainModule( 'src/server/js/index.js', 'server' );
-    api.addFiles( 'src/client/stylesheets/reset.less', 'client', { isImport: true });
+    api.addFiles( 'src/client/stylesheets/core_ui.scss', 'client', { isImport: true });
 });
 
 Package.onTest( function( api ){
@@ -30,7 +30,8 @@ Package.onTest( function( api ){
 function configure( api ){
     api.versionsFrom( '2.12' );
     api.use( 'ecmascript' );
-    api.use( 'less@4.0.0', 'client' );
+    api.use( 'fourseven:scss', 'client' );
+    api.use( 'pwix:layout@1.2.9', 'client' );
     api.use( 'tmeasday:check-npm-versions@1.0.2', 'server' );
 }
 
