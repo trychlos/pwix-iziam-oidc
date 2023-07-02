@@ -5,7 +5,7 @@
 import _ from 'lodash';
 
 uiCore._defaults = {
-    verbosity: PCC_VERBOSE_NONE
+    verbosity: uiCore.C.Verbose.NONE
 };
 
 /**
@@ -18,7 +18,7 @@ uiCore.configure = function( o ){
     if( o && _.isObject( o )){
         _.merge( uiCore._conf, uiCore._defaults, o );
         // be verbose if asked for
-        if( uiCore._conf.verbosity & PCC_VERBOSE_CONFIGURE ){
+        if( uiCore._conf.verbosity & uiCore.C.Verbose.CONFIGURE ){
             console.log( 'pwix:core-ui configure() with', o, 'building', uiCore._conf );
         }
     }

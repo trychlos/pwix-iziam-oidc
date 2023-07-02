@@ -13,9 +13,7 @@ Package.describe({
 Package.onUse( function( api ){
     configure( api );
     api.export([
-        'uiCore',
-        'PCC_VERBOSE_NONE',
-        'PCC_VERBOSE_CONFIGURE'
+        'uiCore'
     ]);
     api.mainModule( 'src/client/js/index.js', 'client' );
     api.mainModule( 'src/server/js/index.js', 'server' );
