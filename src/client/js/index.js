@@ -7,8 +7,6 @@ import '../../common/js/index.js';
 // 2023.06: @popperjs/core 2.11.8
 // 2023.06: bootstrap 5.3.0
 import '@popperjs/core/dist/cjs/popper.js';
-//import 'bootstrap/dist/css/bootstrap.min.css';
-//import 'bootstrap/scss/bootstrap.scss';
 import 'bootstrap/dist/js/bootstrap.min.js';
 
 // FontAwesome are made globally available in the application
