@@ -10,6 +10,7 @@ It materializes our design decisions about user interface:
 - it is Bootstrap-based, so check_npms takes care of requiring @popperjs/core and bootstrap
 - embeds (and provides) latest FontAwesome copy
 - requires pwix:layout package, so that is able to provide responsive layout utilities which adapt to the device
+- provides the Page class to handle pages and routes in an organized way
 
 ## Configuration
 

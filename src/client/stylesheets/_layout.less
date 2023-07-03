@@ -5,9 +5,17 @@
  * All layouts should have their topmost div have this 'x-layout' class
  */
 
-@import "{pwix:layout}/src/client/css/ui_layout.scss";
+@import "{pwix:layout}/src/client/css/ui_layout.less";
 
 .x-layout {
+
+    --x-025-05em: 0.25em;
+    @media screen and ( min-width: @ui-md-width ){
+        --x-025-05em: 0.5em;
+    }
+
+    --x-05-1em: calc( 2 * var( --x-025-05em ));
+
     .x-nowrap {
         white-space: nowrap;
     }
