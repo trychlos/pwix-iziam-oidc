@@ -2,7 +2,12 @@
 
 ## What is it ?
 
-A Meteor package which embeds our UI initializations. THIS PACKAGE IS NOT THOUGHT TO BE PUBLISHED.
+A Meteor package which embeds our UI initializations.
+
+This package:
+
+- IS NOT THOUGHT TO BE PUBLISHED
+- is expected to be added to an application (not required by a package), bringing with it most common dependencies.
 
 It materializes our design decisions about user interface:
 
@@ -11,6 +16,7 @@ It materializes our design decisions about user interface:
 - embeds (and provides) latest FontAwesome copy
 - requires pwix:layout package, so that is able to provide responsive layout utilities which adapt to the device
 - provides the Page class to handle pages and routes in an organized way
+- requires pwix:modal, pwix:tolert, pwix:bootbox for dialogs management
 
 ## Configuration
 
