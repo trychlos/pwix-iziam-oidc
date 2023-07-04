@@ -4,8 +4,10 @@
 
 import _ from 'lodash';
 
-uiCore._defaults = {
-    verbosity: uiCore.C.Verbose.NONE
+CoreUI._conf = {};
+
+CoreUI._defaults = {
+    verbosity: CoreUI.C.Verbose.NONE
 };
 
 /**
@@ -14,16 +16,16 @@ uiCore._defaults = {
  * @param {Object} o configuration options
  * @returns {Object} the package configuration
  */
-uiCore.configure = function( o ){
+CoreUI.configure = function( o ){
     if( o && _.isObject( o )){
-        _.merge( uiCore._conf, uiCore._defaults, o );
+        _.merge( CoreUI._conf, CoreUI._defaults, o );
         // be verbose if asked for
-        if( uiCore._conf.verbosity & uiCore.C.Verbose.CONFIGURE ){
-            console.log( 'pwix:core-ui configure() with', o, 'building', uiCore._conf );
+        if( CoreUI._conf.verbosity & CoreUI.C.Verbose.CONFIGURE ){
+            console.log( 'pwix:core-ui configure() with', o, 'building', CoreUI._conf );
         }
     }
     // also acts as a getter
-    return uiCore._conf;
+    return CoreUI._conf;
 }
 
-_.merge( uiCore._conf, uiCore._defaults );
+_.merge( CoreUI._conf, CoreUI._defaults );

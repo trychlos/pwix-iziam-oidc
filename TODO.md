@@ -22,7 +22,7 @@
 |    2 | 2023- 6- 5 | Change pck-template to exported-object + git mv src/common/js/pck-template.js src/common/js/exported-object.js |
 |      | 2023- 7- 1 | cancelled |
 |    3 | 2023- 6- 5 | Change pckTemplate to exportedObject |
-|      | 2023- 7- 1 | done to uiCore |
+|      | 2023- 7- 1 | done to CoreUI |
 |    4 | 2023- 6- 5 | Change PCK_ to PREFIX_ |
 |      | 2023- 7- 1 | done to PCC_ as pwix client core |
 

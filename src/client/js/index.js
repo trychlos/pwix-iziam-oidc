@@ -19,4 +19,4 @@ import '../third-party/fontawesome-free-6.4.0-web/js/all.js';
 // Page class
 import { Page } from '../classes/page.class.js';
 
-uiCore.Page = Page;
+CoreUI.Page = Page;
