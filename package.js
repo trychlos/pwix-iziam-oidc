@@ -1,6 +1,6 @@
 Package.describe({
     name: 'pwix:core-ui',
-    version: '0.2.0',
+    version: '0.3.0',
     // Brief, one-line summary of the package.
     summary: 'Bootstrap-based core package for user interfaces',
     // URL to the Git repository containing the source code for this package.
@@ -17,7 +17,6 @@ Package.onUse( function( api ){
     ]);
     api.mainModule( 'src/client/js/index.js', 'client' );
     api.mainModule( 'src/server/js/index.js', 'server' );
-    api.addFiles( 'src/client/stylesheets/core_ui.less', 'client', { isImport: true });
 });
 
 Package.onTest( function( api ){
@@ -31,10 +30,12 @@ function configure( api ){
     api.versionsFrom( '2.12' );
     api.use( 'ecmascript' );
     api.use( 'less@4.0.0', 'client' );
-    api.use( 'ostrio:flow-router-extra@3.9.0', 'client' );
-    api.use( 'pwix:layout@1.2.9', 'client' );
+    api.use( 'ostrio:flow-router-extra@3.9.0' );
+    api.use( 'pwix:layout@1.3.0' );
+    api.use( 'pwix:tolert@1.4.0' );
     api.use( 'tmeasday:check-npm-versions@1.0.2', 'server' );
     api.use( 'tracker', 'client' );
+    api.addFiles( 'src/client/stylesheets/core_ui.less', 'client', { isImport: true });
 }
 
 // NPM dependencies are checked in /src/server/js/check_npms.js
