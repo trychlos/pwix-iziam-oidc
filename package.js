@@ -31,10 +31,9 @@ function configure( api ){
     api.use( 'ecmascript' );
     api.use( 'less@4.0.0', 'client' );
     api.use( 'ostrio:flow-router-extra@3.9.0' );
+    api.use( 'pwix:blaze-layout@2.3.1' );
     api.use( 'pwix:bootbox@1.5.0' );
     api.use( 'pwix:cookie-manager@1.3.0' );
-    api.use( 'pwix:layout@1.3.0' );
-    api.use( 'pwix:modal@1.6.0' );
     api.use( 'pwix:tolert@1.4.0' );
     api.use( 'tmeasday:check-npm-versions@1.0.2', 'server' );
     api.use( 'tracker', 'client' );
