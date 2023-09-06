@@ -37,7 +37,18 @@ function configure( api ){
     api.use( 'pwix:tolert@1.4.0' );
     api.use( 'tmeasday:check-npm-versions@1.0.2', 'server' );
     api.use( 'tracker', 'client' );
-    api.addFiles( 'src/client/stylesheets/core_ui.less', 'client', { isImport: true });
+    api.addFiles([
+        'src/client/stylesheets/core_ui.less'
+    ],
+        'client',
+        { isImport: true }
+    );
+    api.addAssets([
+        'src/client/icons/external-link-black.png',
+        'src/client/icons/external-link-white.png'
+    ],
+        'client'
+    );
 }
 
 // NPM dependencies are checked in /src/server/js/check_npms.js

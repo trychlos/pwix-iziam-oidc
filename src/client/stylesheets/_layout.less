@@ -3,113 +3,11 @@
  *
  * Positioning utilities
  * All layouts should have their topmost div have this 'x-layout' class
+ *
+ * Please note that margin-top usage should be deprecated (a Bootstrap design decision that we should assume).
  */
 
-@import "{pwix:layout}/src/client/stylesheets/layout.less";
-
 .x-layout {
-
-    /*
-     * some responsive constants
-     */
-
-    // a responsive value, which grows from 1 on XS to 5 on XXL devices
-    --x-resp-5-1-5: 1;
-    @media screen and ( min-width: @ui-sm-width ){
-        --x-resp-5-1-5: 1.125;
-    }
-    @media screen and ( min-width: @ui-md-width ){
-        --x-resp-5-1-5: 2.08;
-    }
-    @media screen and ( min-width: @ui-lg-width ){
-        --x-resp-5-1-5: 2.667;
-    }
-    @media screen and ( min-width: @ui-xl-width ){
-        --x-resp-5-1-5: 5;
-    }
-
-    // a responsive value, which shrinks from 5 on XS to 1 on XXL devices
-    --x-resp-5-5-1: 5;
-    @media screen and ( min-width: @ui-sm-width ){
-        --x-resp-5-5-1: 2.667;
-    }
-    @media screen and ( min-width: @ui-md-width ){
-        --x-resp-5-5-1: 2.08;
-    }
-    @media screen and ( min-width: @ui-lg-width ){
-        --x-resp-5-5-1: 1.125;
-    }
-    @media screen and ( min-width: @ui-xl-width ){
-        --x-resp-5-5-1: 1;
-    }
-
-    // a responsive value, which grows from 1 on XS to 2 on XXL devices
-    //  same principle than previous, but only three steps
-    --x-resp-3-1-2: 1;
-    @media screen and ( min-width: @ui-md-width ){
-        --x-resp-3-1-2: 1.5;
-    }
-    @media screen and ( min-width: @ui-lg-width ){
-        --x-resp-3-1-2: 2;
-    }
-
-    // a responsive value, which shrinks from 2 on XS to 1 on XXL devices
-    //  same principle than previous, but only three steps
-    --x-resp-3-2-1: 2;
-    @media screen and ( min-width: @ui-md-width ){
-        --x-resp-3-2-1: 1.5;
-    }
-    @media screen and ( min-width: @ui-lg-width ){
-        --x-resp-3-2-1: 1;
-    }
-
-    // a responsive value, which grows from 1 on XS to 2 on XXL devices
-    //  same principle than previous, but only two steps
-    --x-resp-md-1-2: 1;
-    @media screen and ( min-width: @ui-md-width ){
-        --x-resp-md-1-2: 2;
-    }
-
-    // a responsive value, which shrinks from 2 on XS to 1 on XXL devices
-    //  same principle than previous, but only two steps
-    --x-resp-md-2-1: 2;
-    @media screen and ( min-width: @ui-md-width ){
-        --x-resp-md-2-1: 1;
-    }
-
-    // a responsive value, which grows from 1 on XS to 1.5 on XXL devices
-    //  same principle than previous, but only two steps
-    --x-resp-md-1-15: 1;
-    @media screen and ( min-width: @ui-md-width ){
-        --x-resp-md-1-15: 1.5;
-    }
-
-    // a responsive value, which shrinks from 1.5 on XS to 1 on XXL devices
-    //  same principle than previous, but only two steps
-    --x-resp-md-15-1: 1.5;
-    @media screen and ( min-width: @ui-md-width ){
-        --x-resp-md-15-1: 1;
-    }
-
-    // a responsive value, which grows from 1 on XS to 1.5 on XXL devices
-    //  same than previous, with breakpoint on LG
-    --x-resp-lg-1-15: 1;
-    @media screen and ( min-width: @ui-lg-width ){
-        --x-resp-lg-1-15: 1.5;
-    }
-
-    // a responsive value, which shrinks from 1.5 on XS to 1 on XXL devices
-    //  same than previous, with breakpoint on LG
-    --x-resp-lg-15-1: 1.5;
-    @media screen and ( min-width: @ui-lg-width ){
-        --x-resp-lg-15-1: 1;
-    }
-
-    /*
-     * utilities
-     * note that margin-top usage should be deprecated (a Bootstrap design decision that we should assume)
-     */
-
     .x-nowrap {
         white-space: nowrap;
     }
@@ -125,10 +23,45 @@
     .x-right {
         text-align: right;
     }
+    .x-ml05 {
+        margin-left: 0.5em;
+    }
+    .x-ml1 {
+        margin-left: 1em;
+    }
     .x-w100 {
         width: 100%;
     }
     .x-h100 {
         height: 100%;
+    }
+}
+
+.x-layout {
+    a.x-extlink::after {
+        display: inline-block;
+        margin-left: 0.25em;
+        content: ' ';
+        height: 12px;
+        width: 12px;
+    }
+    a.x-extlink.x-black::after {
+        background: url( '/packages/pwix_core-ui/src/client/icons/external-link-black.png' ) no-repeat center/100%;
+    }
+    a.x-extlink.x-white::after {
+        background: url( '/packages/pwix_core-ui/src/client/icons/external-link-white.png' ) no-repeat center/100%;
+    }
+    a.extpdf::after {
+        display: inline-block;
+        margin-left: 0.25em;
+        content: ' ';
+        height: 12px;
+        width: 12px;
+    }
+    a.extpdf.x-black::after {
+        background: url( '/packages/pwix_core-ui/src/client/icons/external-pdf-black.png' ) no-repeat center/100%;
+    }
+    a.extpdf.x-white::after {
+        background: url( '/packages/pwix_core-ui/src/client/icons/external-pdf-white.png' ) no-repeat center/100%;
     }
 }
