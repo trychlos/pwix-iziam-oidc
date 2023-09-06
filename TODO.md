@@ -10,7 +10,8 @@
 
 |   Id | Date       | Description and comment(s) |
 | ---: | :---       | :---                       |
-|    5 |  |  |
+|    9 | 2023- 9- 6 | Integrate legals, cgu, personal policy as templates + relevant links |
+|   10 | 2023- 9- 6 |  |
 
 ---
 ## Done
@@ -25,6 +26,14 @@
 |      | 2023- 7- 1 | done to CoreUI |
 |    4 | 2023- 6- 5 | Change PCK_ to PREFIX_ |
 |      | 2023- 7- 1 | done to PCC_ as pwix client core |
+|    5 | 2023- 9- 6 | Have a class for page objects |
+|      | 2023- 9- 7 | done |
+|    6 | 2023- 9- 6 | Have a singleton class for pages list |
+|      | 2023- 9- 7 | done |
+|    7 | 2023- 9- 6 | Have a reactive var for current page |
+|      | 2023- 9- 7 | done |
+|    8 | 2023- 9- 6 | Get rid of page permissions class |
+|      | 2023- 9- 7 | done |
 
 ---
 P. Wieser

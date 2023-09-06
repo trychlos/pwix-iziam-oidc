@@ -7,6 +7,9 @@ import _ from 'lodash';
 CoreUI._conf = {};
 
 CoreUI._defaults = {
+    adminRole: 'APP_ADMIN',
+    layout: 'app',
+    theme: 't-page',
     verbosity: CoreUI.C.Verbose.NONE
 };
 

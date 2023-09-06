@@ -1,94 +1,165 @@
 /*
- * /imports/client/classes/page.class.js
+ * /src/client/classes/page.class.js
  *
- * This class manages the displayed page as a singleton object, which acts as a reactive datasource.
- * It updates itself each time the route changes.
- * 
- * Client only.
+ * This class manages a defined page, with a schema defined as a SimpleSchema.
  */
 
-import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
-import { Tracker } from 'meteor/tracker';
+import SimpleSchema from 'simpl-schema';
 
 export class Page {
 
     // static data
-    static Singleton = null;
+
+    static Schema = null;
+
+    // static methods
 
     // private data
-    _vars = {
-        dep: new Tracker.Dependency(),
-        name: null,
-        page: null
-    };
+    _name = null;
+    _def = null;
 
-    // private functions
+    // private methods
 
     // public data
 
     /**
      * Constructor
-     * @returns {Page} the singleton instance
+     * @param {String} name the page name
+     * @param {Object} def the page definition as a javascript object
+     * @returns {Page} a Page object
+     * @throws {Exception} if the provided definition is not valid
      */
-    constructor( name ){
-        if( Page.Singleton ){
-            console.log( 'trying to instanciates a new instance of an already existing singleton, returning the singleton' );
-            return Page.Singleton;
+    constructor( name, def ){
+        if( !Page.Schema ){
+            Page.Schema = new SimpleSchema({
+
+                // the page's name
+                name: {
+                    type: String
+                },
+
+                // the layout to be applied to the page
+                layout: {
+                    type: String,
+                    optional: true,
+                    defaultValue: CoreUI._conf.layout
+                },
+
+                // the role(s) needed to just have a display access to this page
+                // Depending of the page, this may not give access to each and every possibe features in that page.
+                rolesAccess: {
+                    type: Array,
+                    optional: true,
+                    defaultValue: []
+                },
+                'rolesAccess.$': {
+                    type: String
+                },
+
+                // the role(s) needed to open an editor on this page
+                // Defaulting to APP_ADMIN (as this role may nonetheless do anything in the application)
+                // only relevant if there is something to edit on that page
+                rolesEdit: {
+                    type: Array,
+                    optional: true,
+                    defaultValue: [ CoreUI._conf.adminRole ]
+                },
+                'rolesEdit.$': {
+                    type: String
+                },
+
+                // the route to the page
+                // MANDATORY (no default): without this option, the page is inaccessible.
+                route: {
+                    type: String,
+                    optional: true
+                },
+
+                // the template to be loaded
+                // MANDATORY (no default): without this option, the page is just not rendered.
+                template: {
+                    type: String,
+                    optional: true
+                },
+
+                // the theme to be applied
+               theme: {
+                    type: String,
+                    optional: true,
+                    defaultValue: CoreUI._conf.theme
+                },
+
+                // whether we want a 'edit now' toggle switch on the top of the page.
+                // Obviously only relevant if there is something to edit on the page.
+                wantEditionSwitch: {
+                    type: Boolean,
+                    optional: true,
+                    defaultValue: false
+                }
+            });
         }
+        // may throw an exception
+        Page.Schema.validate({ name: name, ...def });
 
-        const self = this;
-
-        // an autorun tracker which follows the current page name
-        Tracker.autorun(() => {
-            const name = FlowRouter.getRouteName();
-            self.name( name );
-        });
-
-        Page.Singleton = this;
+        this._name = name;
+        this._def = { ...def };
+    
         return this;
     }
 
     /**
-     * Getter/Setter
-     * @param {String} name the name of the current page
-     * @returns {String} the name of the current page
-     *  Reactive method when used as a getter
+     * @returns the page layout
      */
-    name( name ){
-        if( name !== undefined && name !== this._vars.name ){
-            //console.log( 'setting page', name );
-            this._vars.name = name;
-            this._vars.page = { name:name, ...Meteor.APP.pagesList[name] };
-            this._vars.dep.changed();
-        } else {
-            this._vars.dep.depend();
-        }
-        return this._vars.name;
+    layout(){
+        return this._def.layout;
     }
 
     /**
-     * @returns {String} the name of the template to be rendered for this page
-     *  The 'template' key is mandatory. No default is provided.
-     *  Reactive method
+     * @returns the page name
+     */
+    name(){
+        return this._name;
+    }
+
+    /**
+     * @returns the roles needed to just access the page, maybe empty
+     */
+    rolesAccess(){
+        return this._def.rolesAccess;
+    }
+
+    /**
+     * @returns the roles needed to edit the page content
+     */
+    rolesEdit(){
+        return this._def.rolesEdit;
+    }
+
+    /**
+     * @returns the page route, null if unset
+     */
+    route(){
+        return this._def.route || null;
+    }
+
+    /**
+     * @returns the page template, null if unset
      */
     template(){
-        this._vars.dep.depend();
-        let template = null;
-        if( this._vars.page && this._vars.page.template ){
-            template = this._vars.page.template;
-        } else {
-            console.error( 'template missing in the \''+this._vars.name+'\' page definition, redirecting' );
-            FlowRouter.go( '/' );
-        }
-        return template;
+        return this._def.template || null;
     }
 
     /**
-     * @returns {String} the name of the theme to be applied for this page
-     *  Reactive method
+     * @returns the page theme
      */
     theme(){
-        this._vars.dep.depend();
-        return this._vars.page ? this._vars.page.theme || Meteor.APP.defaults.theme : '';
+        return this._def.theme;
+    }
+
+    /**
+     * @returns whether the page supports an edition toggle switch
+     */
+    wantEditionSwitch(){
+        return this._def.wantEditionSwitch;
     }
 }

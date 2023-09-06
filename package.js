@@ -34,6 +34,7 @@ function configure( api ){
     api.use( 'pwix:blaze-layout@2.3.1' );
     api.use( 'pwix:bootbox@1.5.0' );
     api.use( 'pwix:cookie-manager@1.3.0' );
+    api.use( 'pwix:roles@1.1.3' );
     api.use( 'pwix:tolert@1.4.0' );
     api.use( 'tmeasday:check-npm-versions@1.0.2', 'server' );
     api.use( 'tracker', 'client' );
@@ -45,7 +46,9 @@ function configure( api ){
     );
     api.addAssets([
         'src/client/icons/external-link-black.png',
-        'src/client/icons/external-link-white.png'
+        'src/client/icons/external-link-white.png',
+        'src/client/icons/external-pdf-black.png',
+        'src/client/icons/external-pdf-white.png'
     ],
         'client'
     );
