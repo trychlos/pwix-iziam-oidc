@@ -108,8 +108,13 @@ export class PageCurrent {
      */
     accessAllowed(){
         this._vars.dep.depend();
-        if( this._vars.page && pwixRoles.ready()){
-            return pwixRoles.userIsInRoles( this._vars.user, this._vars.page.rolesAccess());
+        if( this._vars.page ){
+            if( !this._vars.page.rolesAccess().length ){
+                return true;
+            }
+            if( pwixRoles.ready()){
+                return pwixRoles.userIsInRoles( this._vars.user, this._vars.page.rolesAccess());
+            }
         }
         return false;
     }

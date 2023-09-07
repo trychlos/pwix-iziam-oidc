@@ -48,6 +48,12 @@ export class Page {
                     type: String
                 },
 
+                // the menu item label
+                label: {
+                    type: String,
+                    optional: true
+                },
+
                 // the layout to be applied to the page
                 layout: {
                     type: String,
@@ -56,7 +62,8 @@ export class Page {
                 },
 
                 // the role(s) needed to just have a display access to this page
-                // Depending of the page, this may not give access to each and every possibe features in that page.
+                // Depending of the page, this may not give access to each and every possibe features in that page
+                // default value empty means everyone has access to this page
                 rolesAccess: {
                     type: Array,
                     optional: true,
@@ -123,6 +130,13 @@ export class Page {
      */
     inMenus(){
         return this._def.inMenus || [];
+    }
+
+    /**
+     * @returns the menu item label for the page
+     */
+    label(){
+        return this._def.label || '';
     }
 
     /**
