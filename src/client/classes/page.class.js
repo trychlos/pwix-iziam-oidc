@@ -111,7 +111,7 @@ export class Page {
      * @returns the page layout
      */
     layout(){
-        return this._def.layout;
+        return this._def.layout || CoreUI._conf.layout;
     }
 
     /**
@@ -125,14 +125,14 @@ export class Page {
      * @returns the roles needed to just access the page, maybe empty
      */
     rolesAccess(){
-        return this._def.rolesAccess;
+        return this._def.rolesAccess || [];
     }
 
     /**
      * @returns the roles needed to edit the page content
      */
     rolesEdit(){
-        return this._def.rolesEdit;
+        return this._def.rolesEdit || [ CoreUI._conf.adminRole ];
     }
 
     /**
@@ -153,7 +153,7 @@ export class Page {
      * @returns the page theme
      */
     theme(){
-        return this._def.theme;
+        return this._def.theme || CoreUI._conf.theme;
     }
 
     /**
