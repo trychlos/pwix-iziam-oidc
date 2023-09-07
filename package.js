@@ -28,6 +28,7 @@ Package.onTest( function( api ){
 
 function configure( api ){
     api.versionsFrom( '2.12' );
+    api.use( 'check' );
     api.use( 'ecmascript' );
     api.use( 'less@4.0.0', 'client' );
     api.use( 'ostrio:flow-router-extra@3.9.0' );

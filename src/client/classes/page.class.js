@@ -1,16 +1,79 @@
 /*
  * /src/client/classes/page.class.js
  *
- * This class manages a defined page, with a schema defined as a SimpleSchema.
+ * This class manages a defined page.
+ * Only a non-empty name is mandatory. All other fields are free, and up to the application.
+ * 
+ * Known keys are:
+ * 
+ *  - name
+ *                      Type: String
+ *                      MANDATORY (no default).
+ * 
+ *  - inMenus
+ *                      Definition type: String or Array of strings
+ *                      Returned type: Array of strings
+ *                      The menus names in which this page may appear as an item.
+ *                      No default.
+ * 
+ *  - layout
+ *                      Type: String
+ *                      The layout to be used.
+ *                      Defaulting to 'l-app' as configured.
+ * 
+ *  - menuIcon
+ *                      Type: String
+ *                      The name of the FontAwesome icon to be used in front of the menu label.
+ *                      Defaulting to 'fa-chevron-right' as configured.
+ * 
+ *  - menuLabel
+ *                      Type: String
+ *                      The I18n translation key for the menu label.
+ *                      No default.
+ * 
+ *  - rolesAccess
+ *                      Definition type: String or Array of strings
+ *                      Returned type: Array of strings
+ *                      The role(s) needed to just have access to this page.
+ *                      Defaulting to public access if no role is specified.
+ * 
+ *  - rolesEdit
+ *                      Definition type: String or Array of strings
+ *                      Returned type: Array of strings
+ *                      The role(s) needed to edit the page (which actually means everything, and only depends of the application)
+ *                      Defaulting to APP_ADMINISTRATOR (as this role may nonetheless do anything)
+ *
+ *  - route
+ *                      the route to the page
+ *                      MANDATORY (no default): without this option, the page is inaccessible.
+ * 
+ *  - template
+ *                      Type: String
+ *                      The template to be loaded
+ *                      MANDATORY (no default): without this option, the page is just not rendered.
+ * 
+ *  - theme
+ *                      Type: String
+ *                      The theme to be applied.
+ *                      Defaulting to 't-page' as configured.
+ * 
+ *  - wantEditionSwitch
+ *                      Whether we want a 'edit now' toggle switch on the top of the page
+ *                      Defaulting to false.
+ * 
+ * Please note that - after a try - we have decided to NOT use SimpleSchema to validate the provided definition.
+ * Main reasons are:
+ * - it is difficult (or at least not documented) to use a longhand definition when type is either a string or an array of strings
+ * - SimpleSchema doesn't support having non documented fields.
  */
 
-import SimpleSchema from 'simpl-schema';
+import { check } from 'meteor/check';
+
+import _ from 'lodash';
 
 export class Page {
 
     // static data
-
-    static Schema = null;
 
     // static methods
 
@@ -19,6 +82,42 @@ export class Page {
     _def = null;
 
     // private methods
+
+    // check that the (optional) value is a boolean
+    //  set the default value if provided
+    _Boolean( o, key, defValue=null ){
+        if( Object.keys( o ).includes( key )){
+            check( o[key], Boolean );
+        } else if( _.isBoolean( defValue )){
+            o[key] = defValue;
+        }
+    }
+
+    // check that the (optional) value is a string
+    //  set the default value if provided
+    _String( o, key, defValue=null ){
+        if( Object.keys( o ).includes( key )){
+            check( o[key], String );
+        } else if( defValue ){
+            o[key] = defValue;
+        }
+    }
+
+    // check that the (optional) value is a string or an array of string(s)
+    // update the provided object to have an array of string(s)
+    //  set the default value if provided
+    _StringOrArray( o, key, defValue=null ){
+        if( Object.keys( o ).includes( key )){
+            if( !Match.test( o[key], String ) && !Match.test( o[key], [String] )){
+                throw new Error( key+' is not a string nor an array of string(s)' );
+            }
+            if( !_.isArray( o[key] )){
+                o[key] = [ o[key] ];
+            }
+        } else if( defValue ){
+            o[key] = defValue;
+        }
+    }
 
     // public data
 
@@ -30,94 +129,20 @@ export class Page {
      * @throws {Exception} if the provided definition is not valid
      */
     constructor( name, def ){
-        if( !Page.Schema ){
-            Page.Schema = new SimpleSchema({
 
-                // the page's name
-                name: {
-                    type: String
-                },
+        // may throw an error
+        check( name, String );
 
-                // the menus in which this page may appear (if user has access to)
-                inMenus: {
-                    type: Array,
-                    optional: true,
-                    defaultValue: []
-                },
-                'inMenus.$': {
-                    type: String
-                },
-
-                // the menu item label
-                label: {
-                    type: String,
-                    optional: true
-                },
-
-                // the layout to be applied to the page
-                layout: {
-                    type: String,
-                    optional: true,
-                    defaultValue: CoreUI._conf.layout
-                },
-
-                // the role(s) needed to just have a display access to this page
-                // Depending of the page, this may not give access to each and every possibe features in that page
-                // default value empty means everyone has access to this page
-                rolesAccess: {
-                    type: Array,
-                    optional: true,
-                    defaultValue: []
-                },
-                'rolesAccess.$': {
-                    type: String
-                },
-
-                // the role(s) needed to open an editor on this page
-                // Defaulting to APP_ADMIN (as this role may nonetheless do anything in the application)
-                // only relevant if there is something to edit on that page
-                rolesEdit: {
-                    type: Array,
-                    optional: true,
-                    defaultValue: [ CoreUI._conf.adminRole ]
-                },
-                'rolesEdit.$': {
-                    type: String
-                },
-
-                // the route to the page
-                // MANDATORY (no default): without this option, the page is inaccessible.
-                route: {
-                    type: String,
-                    optional: true
-                },
-
-                // the template to be loaded
-                // MANDATORY (no default): without this option, the page is just not rendered.
-                template: {
-                    type: String,
-                    optional: true
-                },
-
-                // the theme to be applied
-               theme: {
-                    type: String,
-                    optional: true,
-                    defaultValue: CoreUI._conf.theme
-                },
-
-                // whether we want a 'edit now' toggle switch on the top of the page.
-                // Obviously only relevant if there is something to edit on the page.
-                wantEditionSwitch: {
-                    type: Boolean,
-                    optional: true,
-                    defaultValue: false
-                }
-            });
-        }
-        // may throw an exception
-        //  not managed as this would be a programmer error
-        Page.Schema.validate({ name: name, ...def });
+        this._StringOrArray( def, 'inMenus', [] );
+        this._String( def, 'layout', CoreUI._conf.layout );
+        this._String( def, 'menuIcon', CoreUI._conf.menuIcon );
+        this._String( def, 'menuLabel' );
+        this._StringOrArray( def, 'rolesAccess', [] );
+        this._StringOrArray( def, 'rolesEdit', [ CoreUI._conf.adminRole ] );
+        this._String( def, 'route' );
+        this._String( def, 'template' );
+        this._String( def, 'theme', CoreUI._conf.theme );
+        this._Boolean( def, 'wantEditionSwitch', false );
 
         this._name = name;
         this._def = { ...def };
@@ -126,72 +151,35 @@ export class Page {
     }
 
     /**
-     * @returns the menus in which this page appears
+     * @summary Generic getter
+     * @param {String} key the name of the desired field
+     * @returns {} the corresponding value
      */
-    inMenus(){
-        return this._def.inMenus || [];
+    get( key ){
+        if( key === 'name' ){
+            return this._name;
+        }
+        return this._def[key];
     }
 
     /**
-     * @returns the menu item label for the page
-     */
-    label(){
-        return this._def.label || '';
-    }
-
-    /**
-     * @returns the page layout
-     */
-    layout(){
-        return this._def.layout || CoreUI._conf.layout;
-    }
-
-    /**
-     * @returns the page name
+     * @returns {String} the page name
      */
     name(){
         return this._name;
     }
 
     /**
-     * @returns the roles needed to just access the page, maybe empty
+     * @returns {Array} the array of access roles
      */
     rolesAccess(){
-        return this._def.rolesAccess || [];
+        return this._def.rolesAccess;
     }
 
     /**
-     * @returns the roles needed to edit the page content
+     * @returns {Array} the array of edit roles
      */
     rolesEdit(){
-        return this._def.rolesEdit || [ CoreUI._conf.adminRole ];
-    }
-
-    /**
-     * @returns the page route, null if unset
-     */
-    route(){
-        return this._def.route || null;
-    }
-
-    /**
-     * @returns the page template, null if unset
-     */
-    template(){
-        return this._def.template || null;
-    }
-
-    /**
-     * @returns the page theme
-     */
-    theme(){
-        return this._def.theme || CoreUI._conf.theme;
-    }
-
-    /**
-     * @returns whether the page supports an edition toggle switch
-     */
-    wantEditionSwitch(){
-        return this._def.wantEditionSwitch;
+        return this._def.rolesEdit;
     }
 }
