@@ -147,6 +147,11 @@ export class Page {
         this._name = name;
         this._def = { ...def };
     
+        // be verbose if asked for
+        if( CoreUI._conf.verbosity & CoreUI.C.Verbose.PAGE ){
+            console.log( 'pwix:core-ui defining \''+name+'\' page' );
+        }
+
         return this;
     }
 

@@ -56,7 +56,10 @@ export class PageCurrent {
         Tracker.autorun(() => {
             const id = Meteor.userId();
             if( id !== this._vars.user ){
-                console.log( 'setting user', id );
+                // be verbose if asked for
+                if( CoreUI._conf.verbosity & CoreUI.C.Verbose.PAGE ){
+                    console.log( 'pwix:core-ui setting \''+id+'\' as current user' );
+                }
                 this._vars.user = id;
                 this._vars.dep.changed();
             }
@@ -67,7 +70,10 @@ export class PageCurrent {
             if( pwixRoles.ready()){
                 const roles = pwixRoles.current();
                 if( !_.isEqual( roles, this._vars.roles )){
-                    console.log( 'setting roles', roles );
+                    // be verbose if asked for
+                    if( CoreUI._conf.verbosity & CoreUI.C.Verbose.PAGE ){
+                        console.log( 'pwix:core-ui setting \''+roles+'\' as current roles' );
+                    }
                     this._vars.roles = roles;
                     this._vars.dep.changed();
                 }
@@ -93,7 +99,10 @@ export class PageCurrent {
      */
     page( page ){
         if( page && ( !this._vars.page || page.name() !== this._vars.page.name())){
-            console.log( 'setting current page', page.name());
+            // be verbose if asked for
+            if( CoreUI._conf.verbosity & CoreUI.C.Verbose.PAGE ){
+                console.log( 'pwix:core-ui setting \''+page.name()+'\' as current page' );
+            }
             this._vars.page = page;
             this._vars.dep.changed();
         } else {

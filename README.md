@@ -63,6 +63,10 @@ Known configuration options are:
 
         Trace `CoreUI.configure()` calls and their result
 
+    - `CoreUI.C.Verbose.PAGE`
+
+        Trace changes on page and relevant authorizations
+
 Please note that `CoreUI.configure()` method should be called in the same terms both in client and server sides.
 
 Remind too that Meteor packages are instanciated at application level. They are so only configurable once, or, in other words, only one instance has to be or can be configured. Addtionnal calls to `CoreUI.configure()` will just override the previous one. You have been warned: **only the application should configure a package**.
