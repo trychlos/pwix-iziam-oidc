@@ -18,6 +18,9 @@ export class PagesCollection {
      * @summary Find a Page by name
      * @param {String} name
      * @returns {Page} the found page, or null
+     * 
+     * Must be static because it is called from PageCurrent class which doesn't know about the current instance
+     * (and PagesCollection.Singleton is considered private).
      */
     static byName( name ){
         return PagesCollection.Singleton.byName( name );
@@ -59,7 +62,7 @@ export class PagesCollection {
      */
     byName( name ){
         let found = null;
-        PagesCollection.Singleton.Enumerate(( page, name ) => {
+        PagesCollection.Singleton.enumerate(( page, name ) => {
             if( page.name() === name ){
                 found = page;
                 return false;   // stop the enumeration
@@ -74,7 +77,7 @@ export class PagesCollection {
      * @param {Function} cb a callback triggered for each page definition as `cb( page, arg )`
      *  the `cb()` must return true to continue the enumeration, false to stop it
      */
-    Enumerate( cb, arg=null ){
+    enumerate( cb, arg=null ){
         PagesCollection.Set.every(( page ) => {
             return cb( page, arg );
         });

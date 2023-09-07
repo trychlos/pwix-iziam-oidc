@@ -38,6 +38,16 @@ export class Page {
                     type: String
                 },
 
+                // the menus in which this page may appear (if user has access to)
+                inMenus: {
+                    type: Array,
+                    optional: true,
+                    defaultValue: []
+                },
+                'inMenus.$': {
+                    type: String
+                },
+
                 // the layout to be applied to the page
                 layout: {
                     type: String,
@@ -99,12 +109,20 @@ export class Page {
             });
         }
         // may throw an exception
+        //  not managed as this would be a programmer error
         Page.Schema.validate({ name: name, ...def });
 
         this._name = name;
         this._def = { ...def };
     
         return this;
+    }
+
+    /**
+     * @returns the menus in which this page appears
+     */
+    inMenus(){
+        return this._def.inMenus || [];
     }
 
     /**
