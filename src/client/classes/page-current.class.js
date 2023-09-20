@@ -5,13 +5,15 @@
  * It updates itself each time the route changes.
  * 
  * Permission returned here are relative to the current user, and are all reactive.
+ * 
+ * This class is designed so that the application can directly instanciate it, or may also derive it to build its own derived class.
  */
 
-import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
-import { pwixRoles } from 'meteor/pwix:roles';
-import { Tracker } from 'meteor/tracker';
-
 import _ from 'lodash';
+
+import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
+import { Roles } from 'meteor/pwix:roles';
+import { Tracker } from 'meteor/tracker';
 
 import { PagesCollection } from './pages-collection.class.js';
 
@@ -48,7 +50,7 @@ export class PageCurrent {
         // an autorun tracker which follows the current page
         Tracker.autorun(() => {
             const name = FlowRouter.getRouteName();
-            const page = name ? PagesCollection.byName( name ) : null;
+            const page = name ? PagesCollection.Singleton.byName( name ) : null;
             PageCurrent.Singleton.page( page );
         });
 
@@ -67,8 +69,8 @@ export class PageCurrent {
 
         // an autorun tracker which dynamically tracks the roles attributed to the current user
         Tracker.autorun(() => {
-            if( pwixRoles.ready()){
-                const roles = pwixRoles.current();
+            if( Roles.ready()){
+                const roles = Roles.current();
                 if( !_.isEqual( roles, this._vars.roles )){
                     // be verbose if asked for
                     if( CoreUI._conf.verbosity & CoreUI.C.Verbose.PAGE ){
@@ -121,8 +123,8 @@ export class PageCurrent {
             if( !this._vars.page.rolesAccess().length ){
                 return true;
             }
-            if( pwixRoles.ready()){
-                return pwixRoles.userIsInRoles( this._vars.user, this._vars.page.rolesAccess());
+            if( Roles.ready()){
+                return Roles.userIsInRoles( this._vars.user, this._vars.page.rolesAccess());
             }
         }
         return false;
@@ -134,8 +136,8 @@ export class PageCurrent {
      */
     editAllowed(){
         this._vars.dep.depend();
-        if( pwixRoles.ready()){
-            return pwixRoles.userIsInRoles( this._vars.user, this._vars.page.rolesEdit());
+        if( Roles.ready()){
+            return Roles.userIsInRoles( this._vars.user, this._vars.page.rolesEdit());
         }
         return false;
     }

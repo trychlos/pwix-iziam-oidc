@@ -19,6 +19,14 @@ It materializes our design decisions about user interface:
 - provides the Authorization class to handle permissions
 - requires pwix:modal, pwix:tolert, pwix:bootbox for dialogs management
 
+## Features
+
+### Pages management
+
+`pwix:core-ui` provides classes to manage the pages collection, the current page and the roles which may be associated with it.
+
+Each class may be used as is, and can also be derived by the application.
+
 ## Configuration
 
 The package's behavior can be configured through a call to the `CoreUI.configure()` method, with just a single javascript object argument, which itself should only contains the options you want override.

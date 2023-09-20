@@ -3,30 +3,23 @@
  *
  * This class manages the collection of individually defined Page objects.
  * Only one occurrence is needed, managed as a singleton.
+ * 
+ * This class is designed so that the application can directly instanciate it, or may also derive it to build its own derived class.
  */
+
+import { Page } from './page.class.js';
 
 export class PagesCollection {
 
     // static data
 
     static Singleton = null;
-    static Set = [];
 
     // static methods
 
-    /**
-     * @summary Find a Page by name
-     * @param {String} name
-     * @returns {Page} the found page, or null
-     * 
-     * Must be static because it is called from PageCurrent class which doesn't know about the current instance
-     * (and PagesCollection.Singleton is considered private).
-     */
-    static byName( name ){
-        return PagesCollection.Singleton.byName( name );
-    }
-
     // private data
+
+    _set = [];
 
     // private methods
 
@@ -50,9 +43,12 @@ export class PagesCollection {
     /**
      * @summary add a Page to our collection
      * @param {Page} page
+     * @returns {PagesCollection} this
      */
     add( page ){
-        PagesCollection.Set.push( page );
+        assert( page instanceof Page, { msg: 'Page expected, found %o' }, page );
+        this._set.push( page );
+        return this;
     }
 
     /**
@@ -62,12 +58,11 @@ export class PagesCollection {
      */
     byName( name ){
         let found = null;
-        PagesCollection.Singleton.enumerate(( page, name ) => {
+        this.enumerate(( page, name ) => {
             if( page.name() === name ){
                 found = page;
-                return false;   // stop the enumeration
             }
-            return true;
+            return found === null;
         }, name );
         return found;
     }
@@ -78,7 +73,7 @@ export class PagesCollection {
      *  the `cb()` must return true to continue the enumeration, false to stop it
      */
     enumerate( cb, arg=null ){
-        PagesCollection.Set.every(( page ) => {
+        this._set.every(( page ) => {
             return cb( page, arg );
         });
     }

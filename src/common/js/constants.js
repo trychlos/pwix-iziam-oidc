@@ -3,7 +3,6 @@
  */
 
 CoreUI.C = {
-
     // verbosity levels
     Verbose: {
         NONE: 0,
@@ -11,3 +10,5 @@ CoreUI.C = {
         PAGE:      0x01 <<  1,
     }
 };
+
+// non exported variables

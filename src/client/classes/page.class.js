@@ -62,14 +62,14 @@
  *                      Defaulting to false.
  * 
  * Please note that - after a try - we have decided to NOT use SimpleSchema to validate the provided definition.
- * Main reasons are:
- * - it is difficult (or at least not documented) to use a longhand definition when type is either a string or an array of strings
- * - SimpleSchema doesn't support having non documented fields.
+ * Main reason is that it is difficult (or at least not documented) to use a longhand definition when type is either a string or an array of strings.
+ * 
+ * This class is designed so that the application can directly instanciate it, or may also derive it to build its own derived class.
  */
 
-import { check } from 'meteor/check';
-
 import _ from 'lodash';
+
+import { check } from 'meteor/check';
 
 export class Page {
 
