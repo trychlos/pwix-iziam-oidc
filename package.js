@@ -1,6 +1,6 @@
 Package.describe({
     name: 'pwix:core-ui',
-    version: '0.3.0',
+    version: '1.0.0-rc',
     // Brief, one-line summary of the package.
     summary: 'Bootstrap-based core package for user interfaces',
     // URL to the Git repository containing the source code for this package.

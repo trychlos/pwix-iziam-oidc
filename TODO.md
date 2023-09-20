@@ -11,7 +11,8 @@
 |   Id | Date       | Description and comment(s) |
 | ---: | :---       | :---                       |
 |    9 | 2023- 9- 6 | Integrate legals, cgu, personal policy as templates + relevant links |
-|   10 | 2023- 9- 6 |  |
+|   10 | 2023- 9-12 | back meteor to 2.9.0 |
+|   11 | 2023- |  |
 
 ---
 ## Done

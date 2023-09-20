@@ -29,7 +29,7 @@ Known configuration options are:
 
     Define the name of the **application administrator** role.
 
-    Default to 'APP_ADMIN'.
+    Default to 'APP_ADMINISTRATOR'.
 
     As a reminder, this same value is expected to be also configured in the `pwix:startup-app-admin` package.
 
