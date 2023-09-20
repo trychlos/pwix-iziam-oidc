@@ -21,11 +21,49 @@ It materializes our design decisions about user interface:
 
 ## Features
 
+### Environment management
+
+While `nodejs` defines only three environments (`development`, `staging` and `production`), and though Meteor has followed the same route, we strongly believe that many more would be better, and that we should not be tied to such only three parts.
+
+We so use the `APP_ENV` environment variable to address our own environment identifier. Through this identifier, we ask the server to publish the setings recorded inside of its private settings (see `pwix:env-settings`).
+
+The settings are read from the server settings for this environment through the path `Meteor.settings[APP.name].environments[<environment_identifer>]`.
+
+If not specified in the `AAP_ENV` variable, the environment identifier falls back to the `nodejs` environment name.
+
+### Layout management
+
+The layout is actually eventually computed from the current page and the current display.
+
+From our point of view:
+
+- `CoreUI` holds a default `l-app` layout, which can be configured.
+
+- Each page define its own layout, though if relies most often on the default layout.
+
+These two steps are display-independant.
+
 ### Pages management
 
 `pwix:core-ui` provides classes to manage the pages collection, the current page and the roles which may be associated with it.
 
 Each class may be used as is, and can also be derived by the application.
+
+- `CoreUI.PagesCollection`
+
+    The collection of defined `CoreUI.Page` as a singleton.
+
+- `CoreUI.Page`
+
+    A page definition.
+
+- `CoreUI.PageCurrent`
+
+    The current page. Each method is itself a reactive data source.
+
+### Settings management
+
+`pwix:core-ui` provides classes to manage the pages collection, the current page and the roles which may be associated with it.
 
 ## Configuration
 
@@ -83,13 +121,9 @@ Remind too that Meteor packages are instanciated at application level. They are 
 
 `CoreUI` provides following items:
 
-### `CoreUI.Authorization`
+### `CoreUI.envSettings`
 
-A client-side Authorization base class, to be derived by the application.
-
-### `CoreUI.PageBase`
-
-A client-side PageBase base class, to be derived by the application.
+A ReactiveVar which is set at startup with the settings for this environment
 
 ## NPM peer dependencies
 

@@ -15,6 +15,7 @@ import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 import { Roles } from 'meteor/pwix:roles';
 import { Tracker } from 'meteor/tracker';
 
+import { Page } from './page.class.js';
 import { PagesCollection } from './pages-collection.class.js';
 
 export class PageCurrent {
@@ -100,13 +101,22 @@ export class PageCurrent {
      *  Reactive method when used as a getter
      */
     page( page ){
-        if( page && ( !this._vars.page || page.name() !== this._vars.page.name())){
-            // be verbose if asked for
-            if( CoreUI._conf.verbosity & CoreUI.C.Verbose.PAGE ){
-                console.log( 'pwix:core-ui setting \''+page.name()+'\' as current page' );
+        if( page ){
+            if( page instanceof Page ){
+                if( !this._vars.page || page.name() !== this._vars.page.name()){
+                    // be verbose if asked for
+                    if( CoreUI._conf.verbosity & CoreUI.C.Verbose.PAGE ){
+                        console.log( 'pwix:core-ui setting \''+page.name()+'\' as current page' );
+                    }
+                    this._vars.page = page;
+                    this._vars.dep.changed();
+
+                } else if( CoreUI._conf.verbosity & CoreUI.C.Verbose.PAGE ){
+                    console.log( 'pwix:core-ui ignoring already set \''+page.name()+'\'' );
+                }
+            } else {
+                console.error( 'expected an instance of Page, found', page );
             }
-            this._vars.page = page;
-            this._vars.dep.changed();
         } else {
             this._vars.dep.depend();
         }

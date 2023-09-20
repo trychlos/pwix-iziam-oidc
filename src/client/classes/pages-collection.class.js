@@ -7,6 +7,8 @@
  * This class is designed so that the application can directly instanciate it, or may also derive it to build its own derived class.
  */
 
+import _ from 'lodash';
+
 import { Page } from './page.class.js';
 
 export class PagesCollection {
@@ -46,8 +48,11 @@ export class PagesCollection {
      * @returns {PagesCollection} this
      */
     add( page ){
-        assert( page instanceof Page, { msg: 'Page expected, found %o' }, page );
-        this._set.push( page );
+        if( !page || !( page instanceof Page )){
+            console.error( 'expected an instance of Page, found', page );
+        } else {
+            this._set.push( page );
+        }
         return this;
     }
 
@@ -58,12 +63,16 @@ export class PagesCollection {
      */
     byName( name ){
         let found = null;
-        this.enumerate(( page, name ) => {
-            if( page.name() === name ){
-                found = page;
-            }
-            return found === null;
-        }, name );
+        if( !name || !_.isString( name )){
+            console.error( 'expected a Page name, found', name );
+        } else {
+            this.enumerate(( page ) => {
+                if( page.name() === name ){
+                    found = page;
+                }
+                return found === null;
+            });
+        }
         return found;
     }
 
@@ -73,8 +82,12 @@ export class PagesCollection {
      *  the `cb()` must return true to continue the enumeration, false to stop it
      */
     enumerate( cb, arg=null ){
-        this._set.every(( page ) => {
-            return cb( page, arg );
-        });
+        if( !cb || !_.isFunction( cb )){
+            console.error( 'expected a function, found', cb );
+        } else {
+            this._set.every(( page ) => {
+                return cb( page, arg );
+            });
+        }
     }
 }
