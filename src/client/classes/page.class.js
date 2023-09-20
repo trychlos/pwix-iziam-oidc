@@ -83,9 +83,13 @@ export class Page {
 
     // private methods
 
+    // protected methods
+    //  these check methods are underscore_prefixed to mark them private along a common usage in javascript
+    //  but we must consider them as only protected, and so useable by derived classes (and so not easily updatable)
+
     // check that the (optional) value is a boolean
     //  set the default value if provided
-    _Boolean( o, key, defValue=null ){
+    _checkBoolean( o, key, defValue=null ){
         if( Object.keys( o ).includes( key )){
             check( o[key], Boolean );
         } else if( _.isBoolean( defValue )){
@@ -95,7 +99,7 @@ export class Page {
 
     // check that the (optional) value is a string
     //  set the default value if provided
-    _String( o, key, defValue=null ){
+    _checkString( o, key, defValue=null ){
         if( Object.keys( o ).includes( key )){
             check( o[key], String );
         } else if( defValue ){
@@ -106,7 +110,7 @@ export class Page {
     // check that the (optional) value is a string or an array of string(s)
     // update the provided object to have an array of string(s)
     //  set the default value if provided
-    _StringOrArray( o, key, defValue=null ){
+    _checkStringOrArray( o, key, defValue=null ){
         if( Object.keys( o ).includes( key )){
             if( !Match.test( o[key], String ) && !Match.test( o[key], [String] )){
                 throw new Error( key+' is not a string nor an array of string(s)' );
@@ -133,16 +137,16 @@ export class Page {
         // may throw an error
         check( name, String );
 
-        this._StringOrArray( def, 'inMenus', [] );
-        this._String( def, 'layout', CoreUI._conf.layout );
-        this._String( def, 'menuIcon', CoreUI._conf.menuIcon );
-        this._String( def, 'menuLabel' );
-        this._StringOrArray( def, 'rolesAccess', [] );
-        this._StringOrArray( def, 'rolesEdit', [ CoreUI._conf.adminRole ] );
-        this._String( def, 'route' );
-        this._String( def, 'template' );
-        this._String( def, 'theme', CoreUI._conf.theme );
-        this._Boolean( def, 'wantEditionSwitch', false );
+        this._checkStringOrArray( def, 'inMenus', [] );
+        this._checkString( def, 'layout', CoreUI._conf.layout );
+        this._checkString( def, 'menuIcon', CoreUI._conf.menuIcon );
+        this._checkString( def, 'menuLabel' );
+        this._checkStringOrArray( def, 'rolesAccess', [] );
+        this._checkStringOrArray( def, 'rolesEdit', [ CoreUI._conf.adminRole ] );
+        this._checkString( def, 'route' );
+        this._checkString( def, 'template' );
+        this._checkString( def, 'theme', CoreUI._conf.theme );
+        this._checkBoolean( def, 'wantEditionSwitch', false );
 
         this._name = name;
         this._def = { ...def };
