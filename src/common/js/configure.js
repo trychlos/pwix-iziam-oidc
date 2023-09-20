@@ -25,7 +25,8 @@ CoreUI.configure = function( o ){
         _.merge( CoreUI._conf, CoreUI._defaults, o );
         // be verbose if asked for
         if( CoreUI._conf.verbosity & CoreUI.C.Verbose.CONFIGURE ){
-            console.log( 'pwix:core-ui configure() with', o, 'building', CoreUI._conf );
+            //console.log( 'pwix:core-ui configure() with', o, 'building', CoreUI._conf );
+            console.log( 'pwix:core-ui configure() with', o );
         }
     }
     // also acts as a getter

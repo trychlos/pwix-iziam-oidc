@@ -75,7 +75,7 @@ export class PageCurrent {
                 if( !_.isEqual( roles, this._vars.roles )){
                     // be verbose if asked for
                     if( CoreUI._conf.verbosity & CoreUI.C.Verbose.PAGE ){
-                        console.log( 'pwix:core-ui setting \''+roles+'\' as current roles' );
+                        console.log( 'pwix:core-ui setting current roles', roles );
                     }
                     this._vars.roles = roles;
                     this._vars.dep.changed();
@@ -106,13 +106,13 @@ export class PageCurrent {
                 if( !this._vars.page || page.name() !== this._vars.page.name()){
                     // be verbose if asked for
                     if( CoreUI._conf.verbosity & CoreUI.C.Verbose.PAGE ){
-                        console.log( 'pwix:core-ui setting \''+page.name()+'\' as current page' );
+                        console.log( 'pwix:core-ui setting current page', page.name());
                     }
                     this._vars.page = page;
                     this._vars.dep.changed();
 
                 } else if( CoreUI._conf.verbosity & CoreUI.C.Verbose.PAGE ){
-                    console.log( 'pwix:core-ui ignoring already set \''+page.name()+'\'' );
+                    console.log( 'pwix:core-ui ignoring already set page', page.name());
                 }
             } else {
                 console.error( 'expected an instance of Page, found', page );
