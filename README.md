@@ -29,7 +29,7 @@ We so use the `APP_ENV` environment variable to address our own environment iden
 
 The settings are read from the server settings for this environment through the path `Meteor.settings[APP.name].environments[<environment_identifer>]`.
 
-If not specified in the `AAP_ENV` variable, the environment identifier falls back to the `nodejs` environment name.
+If not specified in the `APP_ENV` variable, the environment identifier falls back to the `nodejs` environment name.
 
 ### Layout management
 
@@ -63,7 +63,7 @@ Each class may be used as is, and can also be derived by the application.
 
 ### Settings management
 
-`pwix:core-ui` provides classes to manage the pages collection, the current page and the roles which may be associated with it.
+`pwix:core-ui` the settings dedicated to the current environment as the `CoreUI.envSettings` reactive var.
 
 ## Configuration
 
@@ -86,6 +86,12 @@ Known configuration options are:
     Default to 'app'.
 
     This layout is expected to be provided by the application.
+
+- `routePrefix`
+
+    Define the prefix of the routes to be used in provided links.
+
+    Default to `/coreUI`.
 
 - `theme`
 
@@ -124,6 +130,44 @@ Remind too that Meteor packages are instanciated at application level. They are 
 ### `CoreUI.envSettings`
 
 A ReactiveVar which is set at startup with the settings for this environment
+
+### Methods
+
+#### `CoreUI.i18n.namespace()`
+
+Returns the i18n namespace used by the package. Used to add translations at runtime.
+
+### Blaze components
+
+#### `coreGDPRLink`
+
+Display a link to the Privacy Policy.
+
+Parameters can be provided:
+
+- label, defaulting to 'Privacy Policy'
+- title, defaulting to 'Privacy Policy'
+- route, defaulting to configured routePrefix + '/gdpr'.
+
+#### `coreGTULink`
+
+Display a link to the General Terms of Use.
+
+Parameters can be provided:
+
+- label, defaulting to 'General Terms of Use'
+- title, defaulting to 'General Terms of Use'
+- route, defaulting to configured routePrefix + '/gtu'.
+
+#### `coreLegalsLink`
+
+Display a link to the Legal Informations.
+
+Parameters can be provided:
+
+- label, defaulting to 'Legal Informations'
+- title, defaulting to 'Legal Informations'
+- route, defaulting to configured routePrefix + '/legals'.
 
 ## NPM peer dependencies
 

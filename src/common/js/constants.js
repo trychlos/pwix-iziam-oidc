@@ -12,3 +12,5 @@ CoreUI.C = {
 };
 
 // non exported variables
+
+I18N = 'pwix:core-ui:i18n:namespace';

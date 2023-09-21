@@ -10,6 +10,7 @@ CoreUI._defaults = {
     adminRole: 'APP_ADMINISTRATOR',
     layout: 'l-app',
     menuIcon: 'fa-chevron-right',
+    routePrefix: '/coreUI',
     theme: 't-page',
     verbosity: CoreUI.C.Verbose.NONE
 };

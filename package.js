@@ -29,6 +29,7 @@ Package.onTest( function( api ){
 function configure( api ){
     api.versionsFrom( '2.12' );
     api.use( 'check' );
+    api.use( 'blaze-html-templates@2.0.0', 'client' );
     api.use( 'ecmascript' );
     api.use( 'less@4.0.0', 'client' );
     api.use( 'ostrio:flow-router-extra@3.9.0' );
@@ -36,16 +37,14 @@ function configure( api ){
     api.use( 'pwix:bootbox@1.5.0' );
     api.use( 'pwix:cookie-manager@1.3.0' );
     api.use( 'pwix:env-settings@1.5.0' );
+    api.use( 'pwix:i18n@1.5.2' );
     api.use( 'pwix:roles@1.1.3' );
     api.use( 'pwix:tolert@1.4.0' );
     api.use( 'tmeasday:check-npm-versions@1.0.2', 'server' );
     api.use( 'tracker', 'client' );
-    api.addFiles([
-        'src/client/stylesheets/core_ui.less'
-    ],
-        'client',
-        { isImport: true }
-    );
+    api.addFiles( 'src/client/components/coreGDPRLink/coreGDPRLink.js', 'client' );
+    api.addFiles( 'src/client/components/coreGTULink/coreGTULink.js', 'client' );
+    api.addFiles( 'src/client/components/coreLegalsLink/coreLegalsLink.js', 'client' );
     api.addAssets([
         'src/client/icons/external-link-black.png',
         'src/client/icons/external-link-white.png',
@@ -54,6 +53,7 @@ function configure( api ){
     ],
         'client'
     );
+    api.addFiles( 'src/client/stylesheets/core_ui.less', 'client', { isImport: true });
 }
 
 // NPM dependencies are checked in /src/server/js/check_npms.js

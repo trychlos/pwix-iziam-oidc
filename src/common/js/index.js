@@ -7,3 +7,4 @@ import './constants.js';
 //
 import './configure.js';
 import './env-settings.js';
+import './i18n.js';
