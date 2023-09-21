@@ -42,6 +42,7 @@ function configure( api ){
     api.use( 'pwix:tolert@1.4.0' );
     api.use( 'tmeasday:check-npm-versions@1.0.2', 'server' );
     api.use( 'tracker', 'client' );
+    api.addFiles( 'src/client/components/coreCookiesLink/coreCookiesLink.js', 'client' );
     api.addFiles( 'src/client/components/coreGDPRLink/coreGDPRLink.js', 'client' );
     api.addFiles( 'src/client/components/coreGTULink/coreGTULink.js', 'client' );
     api.addFiles( 'src/client/components/coreLegalsLink/coreLegalsLink.js', 'client' );

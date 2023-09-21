@@ -6,6 +6,10 @@ CoreUI.i18n = {
     ... CoreUI.i18n,
     ... {
         en: {
+            cookieslink: {
+                label: 'Cookies management policy',
+                title: 'Cookies management policy'
+            },
             gdprlink: {
                 label: 'Personal data management policy',
                 title: 'Personal data management policy'

@@ -139,6 +139,16 @@ Returns the i18n namespace used by the package. Used to add translations at runt
 
 ### Blaze components
 
+#### `coreCookiesLink`
+
+Display a link to the Cookies Policy.
+
+Parameters can be provided:
+
+- label, defaulting to 'Cookies management policy'
+- title, defaulting to 'Cookies management policy'
+- route, defaulting to configured routePrefix + '/cookies'.
+
 #### `coreGDPRLink`
 
 Display a link to the Privacy Policy.
