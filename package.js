@@ -32,6 +32,7 @@ function configure( api ){
     api.use( 'blaze-html-templates@2.0.0', 'client' );
     api.use( 'ecmascript' );
     api.use( 'less@4.0.0', 'client' );
+    api.use( 'mongo' );
     api.use( 'ostrio:flow-router-extra@3.9.0' );
     api.use( 'pwix:blaze-layout@2.3.1' );
     api.use( 'pwix:bootbox@1.5.0' );

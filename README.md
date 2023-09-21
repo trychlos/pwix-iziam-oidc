@@ -43,6 +43,16 @@ From our point of view:
 
 These two steps are display-independant.
 
+### Forms management
+
+`pwix:core-ui` provides classes to make easier the forms management.
+
+Each class may be used as is, and can also be derived by the application.
+
+- `CoreUI.FormChecker`
+
+    A class to be instanciated (or derived) by each component which would take advantage of it.
+
 ### Pages management
 
 `pwix:core-ui` provides classes to manage the pages collection, the current page and the roles which may be associated with it.
