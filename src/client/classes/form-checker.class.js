@@ -45,6 +45,7 @@ export class FormChecker {
      *          - js: the CSS selector for the field in the DOM
      *  - $ok the jQuery object which defines the OK button (to enable/disable it)
      *  - $err the jQuery object which defines the error message place
+     *  - new: whether we are checking a new record, or an already existing one
      *  - useBootstrapValidationClasses: defaulting to true
      * @returns {FormChecker} a FormChecker object
      */
@@ -88,8 +89,9 @@ export class FormChecker {
             self[fn] = function(){
                 o.instance.$( o.fields[f].js ).removeClass( 'is-valid is-invalid' );
                 const value = o.instance.$( o.fields[f].js ).val() || '';    // input/textarea
-                return self._data.collection[fn]( value )
+                return self._data.collection[fn]( value, { new: self._data.new })
                     .then(( msgerr ) => {
+                        //console.debug( f, msgerr );
                         const valid = Boolean( !msgerr || !msgerr.length );
                         self._data.$err.html( msgerr || '&nbsp;' );
                         self._data.valid.set( valid );
@@ -97,18 +99,6 @@ export class FormChecker {
                         o.instance.$( o.fields[f].js ).addClass( valid ? 'is-valid' : 'is-invalid' );
                         return Promise.resolve( valid );
                     });
-                /*
-                const valid = self._data.collection[fn]( value );
-                //console.debug( 'value='+value, 'valid='+valid );
-                if( !valid && o.fields[f].err ){
-                    console.debug( o.i18n, o.fields[f].err );
-                    self._data.$err.text( pwixI18n.label( o.i18n, o.fields[f].err ));
-                }
-                self._data.valid.set( valid );
-                // set valid/invalid bootstrap classes
-                o.instance.$( o.fields[f].js ).addClass( valid ? 'is-valid' : 'is-invalid' );
-                return valid;
-                */
             };
             self._data.jstof[ o.fields[f].js ] = f;
             return true;
@@ -116,14 +106,15 @@ export class FormChecker {
 
         // define a general function which check each field successively
         //  if specified, the field indicates a field to not check (as just already validated from an input handler)
-        self.check = function( field=null ){
+        //  if display is set to false, then the check doesn't have any effect on the display
+        self.check = function( opts ){
             let promise = Promise.resolve( true );
             let valid = true;
             Object.keys( o.fields ).every(( f ) => {
-                if( !field || field !== f ){
+                if( !opts.field || opts.field !== f ){
                     promise = promise
-                        .then(() => { return self[ 'check_'+f ](); })
-                        .then(( ret ) => { valid = ret; return ret; });
+                        .then(( res ) => { return res ? self[ 'check_'+f ]() : res; })
+                        .then(( res ) => { valid = res; return res; });
                 }
                 return valid;
             });
@@ -133,10 +124,19 @@ export class FormChecker {
                     if( valid ){
                         o.$err.html( '&nbsp;' );
                     }
+                    if( opts.display === false ){
+                        o.$err.html( '&nbsp;' );
+                        Object.keys( o.fields ).every(( f ) => {
+                            o.instance.$( o.fields[f].js ).removeClass( 'is-valid is-invalid' );
+                            return true;
+                        });
+                    }
                     return valid;
                 });
             return promise;
-        }
+        };
+
+        //console.debug( this );
         return this;
     }
 
@@ -157,7 +157,7 @@ export class FormChecker {
         this[ 'check_'+field ]()
             .then(( valid ) => {
                 if( valid ){
-                    return this.check( field );
+                    return this.check({ field: field });
                 }
             });
     }
