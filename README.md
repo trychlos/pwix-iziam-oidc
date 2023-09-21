@@ -179,6 +179,12 @@ Parameters can be provided:
 - title, defaulting to 'Legal Informations'
 - route, defaulting to configured routePrefix + '/legals'.
 
+### Less mixins
+
+#### `.x-btn-variant( @color )`
+
+#### `.x-btn-outline-variant( @color )`
+
 ## NPM peer dependencies
 
 Starting with v 0.3.0, and in accordance with advices from [the Meteor Guide](https://guide.meteor.com/writing-atmosphere-packages.html#npm-dependencies), we no more hardcode NPM dependencies in the `Npm.depends` clause of the `package.js`. 
