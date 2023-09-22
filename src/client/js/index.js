@@ -26,3 +26,6 @@ CoreUI.FormChecker = FormChecker;
 CoreUI.Page = Page;
 CoreUI.PageCurrent = PageCurrent;
 CoreUI.PagesCollection = PagesCollection;
+
+// our functions
+import './DOM.js';
