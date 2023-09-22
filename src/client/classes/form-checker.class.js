@@ -43,9 +43,9 @@ export class FormChecker {
      *      <key> must be the name of the field in the collection schema
      *      <value> is a hash wih following keys:
      *          - js: the CSS selector for the field in the DOM
-     *  - $ok the jQuery object which defines the OK button (to enable/disable it)
-     *  - $err the jQuery object which defines the error message place
-     *  - new: whether we are checking a new record, or an already existing one
+     *  - $ok: if set, the jQuery object which defines the OK button (to enable/disable it)
+     *  - $err: if set, the jQuery object which defines the error message place
+     *  - opts: if set, an object which will be passed to every check_<fn> collection function
      *  - useBootstrapValidationClasses: defaulting to true
      * @returns {FormChecker} a FormChecker object
      */
@@ -55,7 +55,6 @@ export class FormChecker {
         assert( o );
         assert( o.instance instanceof Blaze.TemplateInstance );
         assert( o.collection instanceof Mongo.Collection );
-        assert( o.$ok.length > 0 );
         assert( o.$err.length > 0 );
         assert( o.fields && Object.keys( o.fields ).length > 0 );
 
@@ -63,13 +62,15 @@ export class FormChecker {
         //  + define a ReactiveVar for this instance which will hold the item validity status
         //  + define a reverse hash js selector to field name
         this._data = {
+            instance: o.instance,
             collection: o.collection,
             fields: o.fields,
-            $ok: o.$ok,
-            $err: o.$err,
+            $ok: o.$ok || null,
+            $err: o.$err || null,
+            opts: o.opts || {},
+            useBootstrapValidationClasses: true,
             valid: new ReactiveVar( false ),
-            jstof: {},
-            useBootstrapValidationClasses: true
+            jstof: {}
         };
         if( Object.keys( o ).includes( 'useBootstrapValidationClasses' )){
             this._data.useBootstrapValidationClasses = Boolean( o.useBootstrapValidationClasses );
@@ -77,8 +78,10 @@ export class FormChecker {
 
         // define an autorun which will enable/disable the OK button depending of the validity status
         o.instance.autorun(() => {
-            const valid = self._data.valid.get();
-            self._data.$ok.prop( 'disabled', !valid );
+            if( self._data.$ok ){
+                const valid = self._data.valid.get();
+                self._data.$ok.prop( 'disabled', !valid );
+            }
         });
 
         // for each field to be checked, define its own check function
@@ -89,11 +92,13 @@ export class FormChecker {
             self[fn] = function(){
                 o.instance.$( o.fields[f].js ).removeClass( 'is-valid is-invalid' );
                 const value = o.instance.$( o.fields[f].js ).val() || '';    // input/textarea
-                return self._data.collection[fn]( value, { new: self._data.new })
+                return self._data.collection[fn]( value, self._data.opts )
                     .then(( msgerr ) => {
                         //console.debug( f, msgerr );
                         const valid = Boolean( !msgerr || !msgerr.length );
-                        self._data.$err.html( msgerr || '&nbsp;' );
+                        if( self._data.$err ){
+                            self._data.$err.html( msgerr || '&nbsp;' );
+                        }
                         self._data.valid.set( valid );
                         // set valid/invalid bootstrap classes
                         o.instance.$( o.fields[f].js ).addClass( valid ? 'is-valid' : 'is-invalid' );
@@ -121,11 +126,13 @@ export class FormChecker {
             promise = promise
                 .then(( valid ) => {
                     self._data.valid.set( valid );
-                    if( valid ){
-                        o.$err.html( '&nbsp;' );
+                    if( valid && self._data.$err ){
+                        self._data.$err.html( '&nbsp;' );
                     }
                     if( opts.display === false ){
-                        o.$err.html( '&nbsp;' );
+                        if( self._data.$err ){
+                            self._data.$err.html( '&nbsp;' );
+                        }
                         Object.keys( o.fields ).every(( f ) => {
                             o.instance.$( o.fields[f].js ).removeClass( 'is-valid is-invalid' );
                             return true;
