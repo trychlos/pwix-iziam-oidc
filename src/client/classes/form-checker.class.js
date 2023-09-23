@@ -14,7 +14,7 @@
  */
 
 import _ from 'lodash';
-const assert = require( 'assert' ).strict;
+const assert = require( 'assert' ).strict; // up to nodejs v16.x
 
 import { Mongo } from 'meteor/mongo';
 
@@ -46,17 +46,18 @@ export class FormChecker {
      *  - $ok: if set, the jQuery object which defines the OK button (to enable/disable it)
      *  - $err: if set, the jQuery object which defines the error message place
      *  - opts: if set, an object which will be passed to every check_<fn> collection function
-     *  - useBootstrapValidationClasses: defaulting to true
+     *  - useBootstrapValidationClasses: defaulting to false
      * @returns {FormChecker} a FormChecker object
      */
     constructor( o ){
         const self = this;
         //console.debug( o );
-        assert( o );
-        assert( o.instance instanceof Blaze.TemplateInstance );
-        assert( o.collection instanceof Mongo.Collection );
-        assert( o.$err.length > 0 );
-        assert( o.fields && Object.keys( o.fields ).length > 0 );
+        assert( o, 'expected an Object argument' );
+        assert( o.instance instanceof Blaze.TemplateInstance, 'instance is not a Blaze.TemplateInstance');
+        assert( o.collection instanceof Mongo.Collection, 'collection is not a Mongo.Collection' );
+        assert( !o.$ok || o.$ok.length > 0, 'when provided, $ok must be set to a DOM element' );
+        assert( !o.$err || o.$err.length > 0, 'when provided, $err must be set to a DOM element' );
+        assert( o.fields && Object.keys( o.fields ).length > 0, 'fields must be a non-empty object' );
 
         // keep the provided params
         //  + define a ReactiveVar for this instance which will hold the item validity status
@@ -68,31 +69,32 @@ export class FormChecker {
             $ok: o.$ok || null,
             $err: o.$err || null,
             opts: o.opts || {},
-            useBootstrapValidationClasses: true,
+            useBootstrapValidationClasses: false,
             valid: new ReactiveVar( false ),
             jstof: {}
         };
-        if( Object.keys( o ).includes( 'useBootstrapValidationClasses' )){
-            this._data.useBootstrapValidationClasses = Boolean( o.useBootstrapValidationClasses );
+        if( _.isBoolean( o.useBootstrapValidationClasses )){
+            this._data.useBootstrapValidationClasses = o.useBootstrapValidationClasses;
         }
 
         // define an autorun which will enable/disable the OK button depending of the validity status
-        o.instance.autorun(() => {
-            if( self._data.$ok ){
+        if( self._data.$ok ){
+            o.instance.autorun(() => {
                 const valid = self._data.valid.get();
                 self._data.$ok.prop( 'disabled', !valid );
-            }
-        });
+            });
+        }
 
         // for each field to be checked, define its own check function
         //  this individual check function will always call the corresponding collection function
         //  returns a Promise which resolve to 'valid' status for the field
         Object.keys( o.fields ).every(( f ) => {
             const fn = 'check_'+f;
-            self[fn] = function(){
+            self[fn] = function( opts={} ){
+                const local_opts = { ...self._data.opts, CoreUI: { ...opts }};
                 o.instance.$( o.fields[f].js ).removeClass( 'is-valid is-invalid' );
                 const value = o.instance.$( o.fields[f].js ).val() || '';    // input/textarea
-                return self._data.collection[fn]( value, self._data.opts )
+                return self._data.collection[fn]( value, local_opts )
                     .then(( msgerr ) => {
                         //console.debug( f, msgerr );
                         const valid = Boolean( !msgerr || !msgerr.length );
@@ -112,13 +114,13 @@ export class FormChecker {
         // define a general function which check each field successively
         //  if specified, the field indicates a field to not check (as just already validated from an input handler)
         //  if display is set to false, then the check doesn't have any effect on the display
-        self.check = function( opts ){
+        self.check = function( opts={} ){
             let promise = Promise.resolve( true );
             let valid = true;
             Object.keys( o.fields ).every(( f ) => {
                 if( !opts.field || opts.field !== f ){
                     promise = promise
-                        .then(( res ) => { return res ? self[ 'check_'+f ]() : res; })
+                        .then(( res ) => { return res ? self[ 'check_'+f ]( opts ) : res; })
                         .then(( res ) => { valid = res; return res; });
                 }
                 return valid;
@@ -164,7 +166,7 @@ export class FormChecker {
         this[ 'check_'+field ]()
             .then(( valid ) => {
                 if( valid ){
-                    return this.check({ field: field });
+                    return this.check({ field: field, update: false });
                 }
             });
     }

@@ -9,7 +9,7 @@
  */
 
 import _ from 'lodash';
-const assert = require( 'assert' ).strict;
+const assert = require( 'assert' ).strict; // up to nodejs v16.x
 
 import { Mongo } from 'meteor/mongo';
 
@@ -35,6 +35,9 @@ export class FormMultiple {
      *  - instance: the calling template instance
      *  - $ok: if set, the jQuery object which defines the OK button (to enable/disable it)
      *  - $err: if set, the jQuery object which defines the error message place
+     *  - $ok: if set, the jQuery object which defines the OK button (to enable/disable it)
+     *  - $err: if set, the jQuery object which defines the error message place
+     *  - opts: if set, an object which will be passed to every check_<fn> collection function
      * 
      *  - collection: the collection object
      *  - fields: a hash which defines the fields to be checked, where:
@@ -48,12 +51,10 @@ export class FormMultiple {
     constructor( o ){
         const self = this;
         //console.debug( o );
-        assert( o );
-        assert( o.instance instanceof Blaze.TemplateInstance );
-        //assert( o.collection instanceof Mongo.Collection );
-        //assert( o.$ok.length > 0 );
-        //assert( o.$err.length > 0 );
-        //assert( o.fields && Object.keys( o.fields ).length > 0 );
+        assert( o, 'expected an Object argument' );
+        assert( o.instance instanceof Blaze.TemplateInstance, 'instance is not a Blaze.TemplateInstance');
+        assert( !o.$ok || o.$ok.length > 0, 'when provided, $ok must be set to a DOM element' );
+        assert( !o.$err || o.$err.length > 0, 'when provided, $err must be set to a DOM element' );
 
         // keep the provided params
         //  + define a ReactiveVar for this instance which will hold the item validity status
@@ -62,76 +63,7 @@ export class FormMultiple {
             instance: o.instance,
             $ok: o.$ok || null,
             $err: o.$err || null,
-
-            collection: o.collection,
-            fields: o.fields,
-            valid: new ReactiveVar( false ),
-            jstof: {},
-            useBootstrapValidationClasses: true
-        };
-        if( Object.keys( o ).includes( 'useBootstrapValidationClasses' )){
-            this._data.useBootstrapValidationClasses = Boolean( o.useBootstrapValidationClasses );
-        }
-
-        // define an autorun which will enable/disable the OK button depending of the validity status
-        o.instance.autorun(() => {
-            const valid = self._data.valid.get();
-            self._data.$ok.prop( 'disabled', !valid );
-        });
-
-        // for each field to be checked, define its own check function
-        //  this individual check function will always call the corresponding collection function
-        //  returns a Promise which resolve to 'valid' status for the field
-        Object.keys( o.fields ).every(( f ) => {
-            const fn = 'check_'+f;
-            self[fn] = function(){
-                o.instance.$( o.fields[f].js ).removeClass( 'is-valid is-invalid' );
-                const value = o.instance.$( o.fields[f].js ).val() || '';    // input/textarea
-                return self._data.collection[fn]( value, { new: self._data.new })
-                    .then(( msgerr ) => {
-                        //console.debug( f, msgerr );
-                        const valid = Boolean( !msgerr || !msgerr.length );
-                        self._data.$err.html( msgerr || '&nbsp;' );
-                        self._data.valid.set( valid );
-                        // set valid/invalid bootstrap classes
-                        o.instance.$( o.fields[f].js ).addClass( valid ? 'is-valid' : 'is-invalid' );
-                        return Promise.resolve( valid );
-                    });
-            };
-            self._data.jstof[ o.fields[f].js ] = f;
-            return true;
-        });
-
-        // define a general function which check each field successively
-        //  if specified, the field indicates a field to not check (as just already validated from an input handler)
-        //  if display is set to false, then the check doesn't have any effect on the display
-        self.check = function( opts ){
-            let promise = Promise.resolve( true );
-            let valid = true;
-            Object.keys( o.fields ).every(( f ) => {
-                if( !opts.field || opts.field !== f ){
-                    promise = promise
-                        .then(( res ) => { return res ? self[ 'check_'+f ]() : res; })
-                        .then(( res ) => { valid = res; return res; });
-                }
-                return valid;
-            });
-            promise = promise
-                .then(( valid ) => {
-                    self._data.valid.set( valid );
-                    if( valid ){
-                        o.$err.html( '&nbsp;' );
-                    }
-                    if( opts.display === false ){
-                        o.$err.html( '&nbsp;' );
-                        Object.keys( o.fields ).every(( f ) => {
-                            o.instance.$( o.fields[f].js ).removeClass( 'is-valid is-invalid' );
-                            return true;
-                        });
-                    }
-                    return valid;
-                });
-            return promise;
+            opts: o.opts || {}
         };
 
         //console.debug( this );
