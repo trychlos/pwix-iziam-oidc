@@ -7,10 +7,15 @@
  * 
  * Notes:
  *  - The constructor should be called from the template onRendered().
- *  - The class relies on '<Collection>.check_<field>( value )' functions which return a Promise which resolves to an error message.
+ *  - The class relies on '<Collection>.check_<field>( value, opts )' functions which return a Promise which resolves to an error message
+ *      - value is the current value of the field
+ *      - opts is options object passed-in when instancitaing the FormChecker
+ *        may also contain a CoreUI sub-object with following keys:
+ *          - display: if set, whether or not having a UI feedback, defaulting to true
+ *          - update: if set, whether or not update the current item (for example, do not update when re-checking all fields)
  *  - The class defines:
- *      - a local 'check_<field>()' function for each field which returns a Promise which resolves ti a validity boolean
- *      - a local 'check( [field] )' function which returns a Promise which resolves to a validity boolean.
+ *      - a local 'check_<field>()' function for each field which returns a Promise which resolves to a validity boolean
+ *      - a local 'check( [opts] )' function which returns a Promise which resolves to a validity boolean.
  */
 
 import _ from 'lodash';
@@ -30,6 +35,15 @@ export class FormChecker {
 
     // private methods
 
+    _setMsgerr( msgerr ){
+        if( this._data.$err ){
+            this._data.$err.html( msgerr || '&nbsp;' );
+        }
+        if( this._data.errfn ){
+            this._data.errfn( msgerr || '&nbsp;' );
+        }
+    }
+
     // protected methods
 
     // public data
@@ -44,7 +58,9 @@ export class FormChecker {
      *      <value> is a hash wih following keys:
      *          - js: the CSS selector for the field in the DOM
      *  - $ok: if set, the jQuery object which defines the OK button (to enable/disable it)
+     *  - okfn: if set, a function to be called when OK button must enabled / disabled
      *  - $err: if set, the jQuery object which defines the error message place
+     *  - errfn: if set, a function to be called to display an error message
      *  - opts: if set, an object which will be passed to every check_<fn> collection function
      *  - useBootstrapValidationClasses: defaulting to false
      * @returns {FormChecker} a FormChecker object
@@ -55,8 +71,10 @@ export class FormChecker {
         assert( o, 'expected an Object argument' );
         assert( o.instance instanceof Blaze.TemplateInstance, 'instance is not a Blaze.TemplateInstance');
         assert( o.collection instanceof Mongo.Collection, 'collection is not a Mongo.Collection' );
-        assert( !o.$ok || o.$ok.length > 0, 'when provided, $ok must be set to a DOM element' );
-        assert( !o.$err || o.$err.length > 0, 'when provided, $err must be set to a DOM element' );
+        assert( !o.$ok || o.$ok.length > 0, 'when provided, $ok must be set to a jQuery object' );
+        assert( !o.okfn || _.isFunction( o.okfn ), 'when provided, okfn must be a function' );
+        assert( !o.$err || o.$err.length > 0, 'when provided, $err must be set to a jQuery object' );
+        assert( !o.errfn || _.isFunction( o.errfn ), 'when provided, errfn must be a function' );
         assert( o.fields && Object.keys( o.fields ).length > 0, 'fields must be a non-empty object' );
 
         // keep the provided params
@@ -67,7 +85,9 @@ export class FormChecker {
             collection: o.collection,
             fields: o.fields,
             $ok: o.$ok || null,
+            okfn: o.okfn || null,
             $err: o.$err || null,
+            errfn: o.errfn || null,
             opts: o.opts || {},
             useBootstrapValidationClasses: false,
             valid: new ReactiveVar( false ),
@@ -78,12 +98,15 @@ export class FormChecker {
         }
 
         // define an autorun which will enable/disable the OK button depending of the validity status
-        if( self._data.$ok ){
-            o.instance.autorun(() => {
-                const valid = self._data.valid.get();
+        o.instance.autorun(() => {
+            const valid = self._data.valid.get();
+            if( self._data.$ok ){
                 self._data.$ok.prop( 'disabled', !valid );
-            });
-        }
+            }
+            if( self._data.okfn ){
+                self._data.okfn( valid );
+            }
+        });
 
         // for each field to be checked, define its own check function
         //  this individual check function will always call the corresponding collection function
@@ -98,9 +121,7 @@ export class FormChecker {
                     .then(( msgerr ) => {
                         //console.debug( f, msgerr );
                         const valid = Boolean( !msgerr || !msgerr.length );
-                        if( self._data.$err ){
-                            self._data.$err.html( msgerr || '&nbsp;' );
-                        }
+                        this._setMsgerr( msgerr || '&nbsp;' );
                         self._data.valid.set( valid );
                         // set valid/invalid bootstrap classes
                         o.instance.$( o.fields[f].js ).addClass( valid ? 'is-valid' : 'is-invalid' );
@@ -128,13 +149,10 @@ export class FormChecker {
             promise = promise
                 .then(( valid ) => {
                     self._data.valid.set( valid );
-                    if( valid && self._data.$err ){
-                        self._data.$err.html( '&nbsp;' );
-                    }
-                    if( opts.display === false ){
-                        if( self._data.$err ){
-                            self._data.$err.html( '&nbsp;' );
-                        }
+                    if( valid ){
+                        this._setMsgerr( '&nbsp;' );
+                    } else if( opts.display === false ){
+                        this._setMsgerr( '&nbsp;' );
                         Object.keys( o.fields ).every(( f ) => {
                             o.instance.$( o.fields[f].js ).removeClass( 'is-valid is-invalid' );
                             return true;
