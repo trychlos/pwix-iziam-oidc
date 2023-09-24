@@ -151,7 +151,8 @@ export class FormChecker {
                     self._data.valid.set( valid );
                     if( valid ){
                         this._setMsgerr( '&nbsp;' );
-                    } else if( opts.display === false ){
+                    }
+                    if( opts.display === false ){
                         this._setMsgerr( '&nbsp;' );
                         Object.keys( o.fields ).every(( f ) => {
                             o.instance.$( o.fields[f].js ).removeClass( 'is-valid is-invalid' );
