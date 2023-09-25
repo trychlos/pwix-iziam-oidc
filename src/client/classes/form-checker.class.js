@@ -7,14 +7,14 @@
  * 
  * Notes:
  *  - The constructor should be called from the template onRendered().
- *  - The class relies on '<Collection>.check_<field>( value, opts )' functions which return a Promise which resolves to an error message
+ *  - The class relies on '<Collection>.check_<field>( value, data )' functions which return a Promise which resolves to an error message
  *      - value is the current value of the field
- *      - opts is options object passed-in when instancitaing the FormChecker
- *        may also contain a CoreUI sub-object with following keys:
+ *      - data is an object passed-in when instancitaing the FormChecker
+ *        may contain a CoreUI sub-object with following keys:
  *          - display: if set, whether or not having a UI feedback, defaulting to true
  *          - update: if set, whether or not update the current item (for example, do not update when re-checking all fields)
  *  - The class defines:
- *      - a local 'check_<field>()' function for each field which returns a Promise which resolves to a validity boolean
+ *      - a local 'check_<field>( [opts] })' function for each field which returns a Promise which resolves to a validity boolean
  *      - a local 'check( [opts] )' function which returns a Promise which resolves to a validity boolean.
  */
 
@@ -61,7 +61,7 @@ export class FormChecker {
      *  - okfn: if set, a function to be called when OK button must enabled / disabled
      *  - $err: if set, the jQuery object which defines the error message place
      *  - errfn: if set, a function to be called to display an error message
-     *  - opts: if set, an object which will be passed to every check_<fn> collection function
+     *  - data: if set, an object which will be passed to every check_<fn> collection function
      *  - useBootstrapValidationClasses: defaulting to false
      * @returns {FormChecker} a FormChecker object
      */
@@ -88,7 +88,7 @@ export class FormChecker {
             okfn: o.okfn || null,
             $err: o.$err || null,
             errfn: o.errfn || null,
-            opts: o.opts || {},
+            data: o.data || {},
             useBootstrapValidationClasses: false,
             valid: new ReactiveVar( false ),
             jstof: {}
@@ -114,10 +114,10 @@ export class FormChecker {
         Object.keys( o.fields ).every(( f ) => {
             const fn = 'check_'+f;
             self[fn] = function( opts={} ){
-                const local_opts = { ...self._data.opts, CoreUI: { ...opts }};
+                const local_data = { ...self._data.data, CoreUI: { ...opts }};
                 o.instance.$( o.fields[f].js ).removeClass( 'is-valid is-invalid' );
                 const value = o.instance.$( o.fields[f].js ).val() || '';    // input/textarea
-                return self._data.collection[fn]( value, local_opts )
+                return self._data.collection[fn]( value, local_data )
                     .then(( msgerr ) => {
                         //console.debug( f, msgerr );
                         const valid = Boolean( !msgerr || !msgerr.length );
@@ -133,8 +133,9 @@ export class FormChecker {
         });
 
         // define a general function which check each field successively
-        //  if specified, the field indicates a field to not check (as just already validated from an input handler)
-        //  if display is set to false, then the check doesn't have any effect on the display
+        // opts is an option object with following keys:
+        //  - field: if set, indicates a field to not check (as just already validated from an input handler)
+        //  - display: if set, then says whether checks have any effect on the display, defaulting to true
         self.check = function( opts={} ){
             let promise = Promise.resolve( true );
             let valid = true;
@@ -188,5 +189,14 @@ export class FormChecker {
                     return this.check({ field: field, update: false });
                 }
             });
+    }
+
+    /**
+     * @summary set options to be passed to the form checkers
+     * @param {Object} data
+     */
+    setData( data ){
+        //console.debug( 'setData()', data );
+        this._data.data = data || {};
     }
 }
