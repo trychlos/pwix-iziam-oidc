@@ -57,6 +57,7 @@ export class FormChecker {
      *      <key> must be the name of the field in the collection schema
      *      <value> is a hash wih following keys:
      *          - js: the CSS selector for the field in the DOM
+     *          - display: whether the field should be updated to show valid|invalid state, default to true
      *  - $ok: if set, the jQuery object which defines the OK button (to enable/disable it)
      *  - okfn: if set, a function to be called when OK button must enabled / disabled
      *  - $err: if set, the jQuery object which defines the error message place
@@ -124,7 +125,9 @@ export class FormChecker {
                         this._setMsgerr( msgerr || '&nbsp;' );
                         self._data.valid.set( valid );
                         // set valid/invalid bootstrap classes
-                        o.instance.$( o.fields[f].js ).addClass( valid ? 'is-valid' : 'is-invalid' );
+                        if( o.fields[f].display !== false ){
+                            o.instance.$( o.fields[f].js ).addClass( valid ? 'is-valid' : 'is-invalid' );
+                        }
                         return Promise.resolve( valid );
                     });
             };
