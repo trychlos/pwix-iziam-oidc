@@ -146,7 +146,7 @@ export class PageCurrent {
      */
     editAllowed(){
         this._vars.dep.depend();
-        if( Roles.ready()){
+        if( Roles.ready() && this._vars.user ){
             return Roles.userIsInRoles( this._vars.user, this._vars.page.rolesEdit());
         }
         return false;
