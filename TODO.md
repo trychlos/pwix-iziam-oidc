@@ -11,8 +11,8 @@
 |   Id | Date       | Description and comment(s) |
 | ---: | :---       | :---                       |
 |    9 | 2023- 9- 6 | Integrate legals, cgu, personal policy as templates + relevant links |
-|   10 | 2023- 9-12 | back meteor to 2.9.0 |
-|   11 | 2023- |  |
+|   11 | 2023- 9-28 | env-settings: package configuration is re-run when language changes - why? |
+|   12 |  |  |
 
 ---
 ## Done
@@ -35,6 +35,8 @@
 |      | 2023- 9- 7 | done |
 |    8 | 2023- 9- 6 | Get rid of page permissions class |
 |      | 2023- 9- 7 | done |
+|   10 | 2023- 9-12 | back meteor to 2.9.0 |
+|      | 2023- 9-28 | done |
 
 ---
 P. Wieser

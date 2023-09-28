@@ -27,7 +27,7 @@ Package.onTest( function( api ){
 });
 
 function configure( api ){
-    api.versionsFrom( '2.12' );
+    api.versionsFrom( '2.9.0' );
     api.use( 'check' );
     api.use( 'blaze-html-templates@2.0.0', 'client' );
     api.use( 'ecmascript' );

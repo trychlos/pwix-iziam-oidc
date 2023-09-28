@@ -139,7 +139,10 @@ Remind too that Meteor packages are instanciated at application level. They are 
 
 ### `CoreUI.envSettings`
 
-A ReactiveVar which is set at startup with the settings for this environment
+A ReactiveVar which is set at startup with the settings for this environment. It contains following keys:
+
+- `env`: the name of the running environment from `APP_ENV` environment variable
+- `settings`: the relevant settings read from the APP/private/config/server JSON configuration.
 
 ### Methods
 
