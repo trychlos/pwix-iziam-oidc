@@ -25,6 +25,13 @@ export class PageCurrent {
 
     // static methods
 
+    /**
+     * @returns {PageCurrent} the current page
+     */
+    static getPage(){
+        return PageCurrent.Singleton.page();
+    }
+
     // private data
     _vars = {
         dep: new Tracker.Dependency(),
