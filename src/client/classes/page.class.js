@@ -52,6 +52,10 @@
  *                      The template to be loaded
  *                      MANDATORY (no default): without this option, the page is just not rendered.
  * 
+ *  - templateParms
+ *                      Type: Object
+ *                      Parameters to be passed to the template, defaulting to none.
+ * 
  *  - theme
  *                      Type: String
  *                      The theme to be applied.
@@ -123,6 +127,16 @@ export class Page {
         }
     }
 
+    // check that the (optional) value is an object
+    //  set the default value if provided
+    _checkObject( o, key, defValue=null ){
+        if( Object.keys( o ).includes( key )){
+            check( o[key], Object );
+        } else if( defValue ){
+            o[key] = defValue;
+        }
+    }
+
     // public data
 
     /**
@@ -145,6 +159,7 @@ export class Page {
         this._checkStringOrArray( def, 'rolesEdit', [ CoreUI._conf.adminRole ] );
         this._checkString( def, 'route' );
         this._checkString( def, 'template' );
+        this._checkObject( def, 'templateParms' );
         this._checkString( def, 'theme', CoreUI._conf.theme );
         this._checkBoolean( def, 'wantEditionSwitch', false );
 
