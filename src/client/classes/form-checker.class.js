@@ -118,14 +118,15 @@ export class FormChecker {
                 const local_data = { ...self._data.data, CoreUI: { ...opts }};
                 o.instance.$( o.fields[f].js ).removeClass( 'is-valid is-invalid' );
                 const value = o.instance.$( o.fields[f].js ).val() || '';    // input/textarea
+                //console.debug( 'value', value );
                 return self._data.collection[fn]( value, local_data )
                     .then(( msgerr ) => {
-                        //console.debug( f, msgerr );
                         const valid = Boolean( !msgerr || !msgerr.length );
+                        //console.debug( f, msgerr, valid );
                         this._setMsgerr( msgerr || '&nbsp;' );
                         self._data.valid.set( valid );
                         // set valid/invalid bootstrap classes
-                        if( o.fields[f].display !== false ){
+                        if( o.fields[f].display !== false && self._data.useBootstrapValidationClasses === true ){
                             o.instance.$( o.fields[f].js ).addClass( valid ? 'is-valid' : 'is-invalid' );
                         }
                         return Promise.resolve( valid );
@@ -139,6 +140,8 @@ export class FormChecker {
         // opts is an option object with following keys:
         //  - field: if set, indicates a field to not check (as just already validated from an input handler)
         //  - display: if set, then says whether checks have any effect on the display, defaulting to true
+        //  - update: if set, then says whether the value found in the form should update the edited object, defaulting to true
+        // returns a Promise which eventually resolves to the global validity status
         self.check = function( opts={} ){
             let promise = Promise.resolve( true );
             let valid = true;
@@ -183,13 +186,18 @@ export class FormChecker {
      * 1. we check the input field identified by its selector
      *      the check function put itself an error message if not ok
      * 2. if ok, we check all fields (but this one)
+     * 
+     * @returns {Promise} which eventually resolves to the validity status (of the single current field if false, of the whole form else)
      */
     inputHandler( event ){
+        //console.debug( this );
         const field = this._data.jstof[ event.handleObj.selector ];
-        this[ 'check_'+field ]()
+        return this[ 'check_'+field ]()
             .then(( valid ) => {
                 if( valid ){
                     return this.check({ field: field, update: false });
+                } else {
+                    return false;
                 }
             });
     }
