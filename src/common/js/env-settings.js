@@ -20,6 +20,9 @@ if( Meteor.isServer ){
     Meteor.methods({
         // return an object { env, settings } containing the server settings available for the current environment
         'settings.environment'(){
+            if( !Object.keys( process.env ).includes( 'APP_ENV' )){
+                console.warn( 'process.env.APP_ENV is unset' );
+            }
             const env = process.env.APP_ENV || Meteor.settings.runtime.env;
             const o = {
                 env: env,
