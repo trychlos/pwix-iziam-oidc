@@ -12,7 +12,7 @@ Template.coreLegalsLink.helpers({
 
     // the route
     route(){
-        return ( CoreUI._conf.routePrefix || '' ) + ( this.route || '/legals' );
+        return this.route || ( CoreUI._conf.routePrefix || '' )+'/legals';
     },
 
     // the title
