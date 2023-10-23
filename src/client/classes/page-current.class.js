@@ -92,6 +92,7 @@ export class PageCurrent {
 
         // an autorun tracker which redirect to home page if user is not habilited to this one
         Tracker.autorun(() => {
+            this._vars.dep.depend();
             if( this._vars.page && !PageCurrent.Singleton.accessAllowed()){
                 console.log( 'Page', this._vars.page, 'not allowed, redirecting to \'/\'' );
                 FlowRouter.redirect( '/' );
