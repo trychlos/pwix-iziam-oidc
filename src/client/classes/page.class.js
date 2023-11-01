@@ -16,11 +16,6 @@
  *                      The menus names in which this page may appear as an item.
  *                      No default.
  * 
- *  - layout
- *                      Type: String
- *                      The layout to be used.
- *                      Defaulting to 'l-app' as configured.
- * 
  *  - menuIcon
  *                      Type: String
  *                      The name of the FontAwesome icon to be used in front of the menu label.
@@ -152,7 +147,6 @@ export class Page {
         check( name, String );
 
         this._checkStringOrArray( def, 'inMenus', [] );
-        this._checkString( def, 'layout', CoreUI._conf.layout );
         this._checkString( def, 'menuIcon', CoreUI._conf.menuIcon );
         this._checkString( def, 'menuLabel' );
         this._checkStringOrArray( def, 'rolesAccess', [] );

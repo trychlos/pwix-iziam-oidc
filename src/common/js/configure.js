@@ -8,7 +8,6 @@ CoreUI._conf = {};
 
 CoreUI._defaults = {
     adminRole: 'APP_ADMINISTRATOR',
-    layout: 'l-app',
     menuIcon: 'fa-chevron-right',
     routePrefix: '/coreUI',
     theme: 't-page',
