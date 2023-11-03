@@ -117,8 +117,9 @@ export class FormChecker {
             self[fn] = function( opts={} ){
                 const local_data = { ...self._data.data, CoreUI: { ...opts }};
                 o.instance.$( o.fields[f].js ).removeClass( 'is-valid is-invalid' );
-                const value = o.instance.$( o.fields[f].js ).val() || '';    // input/textarea
-                //console.debug( 'value', value );
+                const complement = o.fields[f].type === 'select' ? ' option:selected' : '';
+                const value = o.instance.$( o.fields[f].js+complement ).val() || '';    // input/textarea/select
+                //console.debug( f, 'value', value );
                 return self._data.collection[fn]( value, local_data )
                     .then(( msgerr ) => {
                         const valid = Boolean( !msgerr || !msgerr.length );
