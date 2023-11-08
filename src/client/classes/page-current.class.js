@@ -142,7 +142,7 @@ export class PageCurrent {
                 return true;
             }
             if( Roles.ready()){
-                return Roles.userIsInRoles( this._vars.user, this._vars.page.rolesAccess());
+                return Roles.userIsInRoles( this._vars.user, this._vars.page.rolesAccess(), { anyScope: true });
             }
         }
         return false;
