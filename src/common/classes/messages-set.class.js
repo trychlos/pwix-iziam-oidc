@@ -94,7 +94,6 @@ export class MessagesSet {
      */
     push( o ){
         if( o ){
-            console.debug( 'pushing', o );
             this.#dep.changed();
             this.#set.push( o );
         }

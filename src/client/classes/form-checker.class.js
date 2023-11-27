@@ -53,12 +53,13 @@ export class FormChecker {
      * Constructor
      * @param {Object} o an object with following keys:
      *  - instance: the calling template instance
-     *  - collection: the collection object
+     *  - collection: the collection object, or any object which holds the check_<field> functions
      *  - fields: a hash which defines the fields to be checked, where:
      *      <key> must be the name of the field in the collection schema
      *      <value> is a hash wih following keys:
      *          - js: the jQuery CSS selector for the INPUT/SELECT field in the DOM
      *          - display: whether the field should be updated to show valid|invalid state, default to true
+     *          - val: a function to get the value from the provided item, defaulting to just getting the field value
      *  - $ok: if set, the jQuery object which defines the OK button (to enable/disable it)
      *  - okfn: if set, a function to be called when OK button must enabled / disabled
      *  - $err: if set, the jQuery object which defines the error message place
@@ -73,7 +74,8 @@ export class FormChecker {
         //console.debug( o );
         assert( o, 'expected an Object argument' );
         assert( o.instance instanceof Blaze.TemplateInstance, 'instance is not a Blaze.TemplateInstance');
-        assert( o.collection instanceof Mongo.Collection, 'collection is not a Mongo.Collection' );
+        //assert( o.collection instanceof Mongo.Collection, 'collection is not a Mongo.Collection' );
+        assert( o.collection && _.isObject( o.collection ), 'collection is not provided or not an object' );
         assert( !o.$ok || o.$ok.length > 0, 'when provided, $ok must be set to a jQuery object' );
         assert( !o.okfn || _.isFunction( o.okfn ), 'when provided, okfn must be a function' );
         assert( !o.$err || o.$err.length > 0, 'when provided, $err must be set to a jQuery object' );
@@ -141,39 +143,49 @@ export class FormChecker {
             return true;
         });
 
-        // define a general function which check each field successively
-        // opts is an option object with following keys:
-        //  - field: if set, indicates a field to not check (as just already validated from an input handler)
-        //  - display: if set, then says whether checks have any effect on the display, defaulting to true
-        //  - update: if set, then says whether the value found in the form should update the edited object, defaulting to true
-        // returns a Promise which eventually resolves to the global validity status
-        self.check = function( opts={} ){
-            let valid = true;
-            let promises = [];
-            const self = this;
-            Object.keys( self.#priv.fields ).every(( f ) => {
-                if( !opts.field || opts.field !== f ){
-                    promises.push( self[ 'check_'+f ]( opts )
-                        .then(( v ) => {
-                            valid = valid && v;
-                        }));
-                }
-                return true;
-            });
-            return Promise.allSettled( promises )
-                .then(() => {
-                    if( opts.display === false ){
-                        Object.keys( self.#priv.fields ).every(( f ) => {
-                            self.#priv.instance.$( self.#priv.fields[f].js ).removeClass( 'is-valid is-invalid' );
-                            return true;
-                        });
-                    }
-                    return Promise.resolve( valid );
-                });
-        };
-
         //console.debug( this );
         return this;
+    }
+
+    /**
+     * @summary a general function which check each field successively
+     * @param {Object} opts an option object with following keys:
+     *  - field: if set, indicates a field to not check (as just already validated from an input handler)
+     *  - display: if set, then says whether checks have any effect on the display, defaulting to true
+     *  - update: if set, then says whether the value found in the form should update the edited object, defaulting to true
+     * @returns a Promise which eventually resolves to the global validity status
+     */
+    check( opts={} ){
+        let valid = true;
+        let promises = [];
+        const self = this;
+        Object.keys( self.#priv.fields ).every(( f ) => {
+            if( !opts.field || opts.field !== f ){
+                promises.push( self[ 'check_'+f ]( opts )
+                    .then(( v ) => {
+                        valid = valid && v;
+                    }));
+            }
+            return true;
+        });
+        return Promise.allSettled( promises )
+            .then(() => {
+                if( opts.display === false ){
+                    self.clear();
+                }
+                return Promise.resolve( valid );
+            });
+    }
+
+    /**
+     * @summary Clears the validity indicators
+     */
+    clear(){
+        const self = this;
+        Object.keys( self.#priv.fields ).every(( f ) => {
+            self.#priv.instance.$( self.#priv.fields[f].js ).removeClass( 'is-valid is-invalid' );
+            return true;
+        });
     }
 
     /**
@@ -238,7 +250,17 @@ export class FormChecker {
     setForm( item ){
         const self = this;
         Object.keys( self.#priv.fields ).every(( f ) => {
-            self.#priv.instance.$( self.#priv.fields[f].js ).val( item[f] || '' );
+            const value = self.#priv.fields[f].val ? self.#priv.fields[f].val( item ) : item[f];
+            console.debug( item, f, value );
+            const $elt = self.#priv.instance.$( self.#priv.fields[f].js );
+            const tagName = $elt.prop( 'tagName' );
+            const eltType = $elt.attr( 'type' );
+            if( tagName === 'INPUT' && eltType === 'checkbox' ){
+                console.debug( $elt, value );
+                $elt.prop( 'checked', value );
+            } else {
+                $elt.val( value );
+            }
             return true;
         });
     }

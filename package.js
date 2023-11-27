@@ -51,7 +51,8 @@ function configure( api ){
         'src/client/icons/external-link-black.png',
         'src/client/icons/external-link-white.png',
         'src/client/icons/external-pdf-black.png',
-        'src/client/icons/external-pdf-white.png'
+        'src/client/icons/external-pdf-white.png',
+        'src/client/icons/svgrepo-471618-link-external.svg'
     ],
         'client'
     );
