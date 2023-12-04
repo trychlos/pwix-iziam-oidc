@@ -20,7 +20,7 @@
 import _ from 'lodash';
 const assert = require( 'assert' ).strict; // up to nodejs v16.x
 
-import { Mongo } from 'meteor/mongo';
+import { TypedMessage } from '../../common/classes/typed-message.class.js';
 
 export class FormChecker {
 
@@ -34,6 +34,23 @@ export class FormChecker {
 
     // private methods
 
+    // an error message returned by the check function is only considered a validity error if it is of type ERROR
+    //  else keep it cool
+    _errToValid( err ){
+        let valid = true;
+        if( err ){
+            if( err.type() === TypedMessage.Type.ERROR ){
+                valid = false;
+            } else if( err.type() === TypedMessage.Type.WARNING && this.#priv.warningIsError ){
+                valid = false;
+            } else if( err.type() === TypedMessage.Type.INFO && this.#priv.infoIsError ){
+                valid = false;
+            }
+        }
+        //console.debug( 'err', err, 'valid', valid );
+        return valid;
+    }
+
     // push the message inside the form or call the corresponding function
     //  'err' here should be a TypedMessage
     _pushMessage( err ){
@@ -42,6 +59,35 @@ export class FormChecker {
         }
         if( this.#priv.errfn ){
             this.#priv.errfn( err );
+        }
+    }
+
+    // get the value from the form
+    _valueFrom( field ){
+        //const     // input/textarea/select
+        const $elt = this.#priv.instance.$( this.#priv.fields[field].js );
+        const tagName = $elt.prop( 'tagName' );
+        const eltType = $elt.attr( 'type' );
+        let value;
+        if( tagName === 'INPUT' && eltType === 'checkbox' ){
+            value = $elt.prop( 'checked' );
+        } else {
+            value = this.#priv.instance.$( this.#priv.fields[field].js ).val() || '';
+        }
+        return value;
+    }
+
+    // set the value from the item to the form field according to the type of field
+    _valueTo( field, item ){
+        const value = this.#priv.fields[field].val ? this.#priv.fields[field].val( item ) : item[field];
+        //console.debug( item, f, value );
+        const $elt = this.#priv.instance.$( this.#priv.fields[field].js );
+        const tagName = $elt.prop( 'tagName' );
+        const eltType = $elt.attr( 'type' );
+        if( tagName === 'INPUT' && eltType === 'checkbox' ){
+            $elt.prop( 'checked', value );
+        } else {
+            $elt.val( value );
         }
     }
 
@@ -67,6 +113,8 @@ export class FormChecker {
      *  - errclear: if set, a function to be called to clear all messages
      *  - data: if set, an object which will be passed to every check_<fn> collection function
      *  - useBootstrapValidationClasses: defaulting to false
+     *  - warningIsError: whether a warning should return an invalid state, defaulting to false
+     *  - infoIsError: whether an info should return an invalid state, defaulting to false
      * @returns {FormChecker} a FormChecker object
      */
     constructor( o ){
@@ -96,10 +144,18 @@ export class FormChecker {
             errclear: o.errclear || null,
             data: o.data || {},
             useBootstrapValidationClasses: false,
+            warningIsError: false,
+            infoIsError: false,
             valid: new ReactiveVar( false )
         };
         if( _.isBoolean( o.useBootstrapValidationClasses )){
             this.#priv.useBootstrapValidationClasses = o.useBootstrapValidationClasses;
+        }
+        if( _.isBoolean( o.warningIsError )){
+            this.#priv.warningIsError = o.warningIsError;
+        }
+        if( _.isBoolean( o.infoIsError )){
+            this.#priv.infoIsError = o.infoIsError;
         }
 
         // define an autorun which will enable/disable the OK button depending of the validity status
@@ -122,10 +178,11 @@ export class FormChecker {
             const fn = 'check_'+f;
             self[fn] = function( opts={} ){
                 o.instance.$( o.fields[f].js ).removeClass( 'is-valid is-invalid' );
-                const value = o.instance.$( o.fields[f].js ).val() || '';    // input/textarea/select
+                const value = this._valueFrom( f );
                 return self.#priv.collection[fn]( value, self.#priv.data, opts )
                     .then(( err ) => {
-                        const valid = Boolean( err === null );
+                        //console.debug( f, err );
+                        const valid = this._errToValid( err );
                         if( err ){
                             this._pushMessage( err );
                         }
@@ -250,17 +307,7 @@ export class FormChecker {
     setForm( item ){
         const self = this;
         Object.keys( self.#priv.fields ).every(( f ) => {
-            const value = self.#priv.fields[f].val ? self.#priv.fields[f].val( item ) : item[f];
-            console.debug( item, f, value );
-            const $elt = self.#priv.instance.$( self.#priv.fields[f].js );
-            const tagName = $elt.prop( 'tagName' );
-            const eltType = $elt.attr( 'type' );
-            if( tagName === 'INPUT' && eltType === 'checkbox' ){
-                console.debug( $elt, value );
-                $elt.prop( 'checked', value );
-            } else {
-                $elt.val( value );
-            }
+            self._valueTo( f, item );
             return true;
         });
     }

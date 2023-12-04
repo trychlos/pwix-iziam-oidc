@@ -14,7 +14,7 @@ export class MessagesSet {
 
     static Hierarchy = [
         TypedMessage.Type.ERROR,
-        TypedMessage.Type.WARN,
+        TypedMessage.Type.WARNING,
         TypedMessage.Type.INFO,
         TypedMessage.Type.DEBUG,
         TypedMessage.Type.TRACE,

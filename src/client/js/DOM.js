@@ -3,8 +3,21 @@
  */
 
 import _ from 'lodash';
+import ellipsize from 'ellipsize';
 
 CoreUI.DOM = {
+
+    // ellipsize a single line of text to fit into the width of the given container
+    //  nb: when working in a table, caller should rather provide the header column as a container
+    //  as it may happens that the column in the first row has not yet a width when Blaze run for the first time
+    ellipsizeLine( $container, text ){
+        const width = $container.width();
+        const font = parseInt( $container.css( 'fontSize' ));
+        const nbmax = parseInt( width / font );
+        const res = width && font ? ellipsize( text, parseInt( width / font ), { truncate: true }) : '';
+        //console.debug( 'text', text, 'nbmax', nbmax, 'res', res );
+        return res;
+    },
 
     // Set the same height for all panes of a tabbed panel
     sameHeight( $tabbed ){

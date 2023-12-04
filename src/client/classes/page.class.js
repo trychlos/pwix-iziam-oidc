@@ -191,13 +191,13 @@ export class Page {
      * @returns {Array} the array of access roles
      */
     rolesAccess(){
-        return this._def.rolesAccess;
+        return this._def.rolesAccess || [];
     }
 
     /**
      * @returns {Array} the array of edit roles
      */
     rolesEdit(){
-        return this._def.rolesEdit;
+        return this._def.rolesEdit || [];
     }
 }

@@ -15,7 +15,7 @@ export class TypedMessage {
     //  we may suggest to consider that DEBUG = TRACE = LOG
     static Type = {
         ERROR: 'ERROR',
-        WARN: 'WARNING',
+        WARNING: 'WARNING',
         INFO : 'INFORMATION',
         DEBUG: 'DEBUG',
         TRACE: 'TRACE',
