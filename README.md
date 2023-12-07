@@ -162,6 +162,23 @@ Parameters can be provided:
 - title, defaulting to 'Cookies management policy'
 - route, defaulting to configured routePrefix + '/cookies'.
 
+#### `coreFieldCheckIndicator`
+
+Display an indicator about the validity status of a field.
+
+Parameters:
+
+- type: a `CoreUI.FieldCheck` constant as `INVALID`, `NONE`, `UNCOMPLETE` or `VALID`.
+
+#### `coreFieldTypeIndicator`
+
+Display an indicator about the type of a field.
+
+Parameters:
+
+- type: a `CoreUI.FieldType` constant as `INFO`, `SAVE` or `WORK`
+- classes: if set, a list of classes to be added to the default ones.
+
 #### `coreGDPRLink`
 
 Display a link to the Privacy Policy.

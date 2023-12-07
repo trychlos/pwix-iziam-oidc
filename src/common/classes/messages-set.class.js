@@ -13,12 +13,12 @@ export class MessagesSet {
     // static data
 
     static Hierarchy = [
-        TypedMessage.Type.ERROR,
-        TypedMessage.Type.WARNING,
-        TypedMessage.Type.INFO,
-        TypedMessage.Type.DEBUG,
-        TypedMessage.Type.TRACE,
-        TypedMessage.Type.LOG
+        TypedMessage.C.ERROR,
+        TypedMessage.C.WARNING,
+        TypedMessage.C.INFO,
+        TypedMessage.C.DEBUG,
+        TypedMessage.C.TRACE,
+        TypedMessage.C.LOG
     ];
 
     // static methods
@@ -85,7 +85,7 @@ export class MessagesSet {
      */
     lastError(){
         this.#dep.depend();
-        return this._lastFromType( TypedMessage.Type.ERROR );
+        return this._lastFromType( TypedMessage.C.ERROR );
     }
 
     /**

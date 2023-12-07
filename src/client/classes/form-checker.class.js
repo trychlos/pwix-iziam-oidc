@@ -6,7 +6,7 @@
  * 
  * Notes:
  *  - The constructor should be called from the template onRendered().
- *  - The class relies on '<Collection>.check_<field>( value, data, opts )' functions which return a Promise which resolves to a TypedMessage or null
+ *  - The class relies on '<Object>.check_<field>( value, data, opts )' functions which return a Promise which resolves to a TypedMessage or null
  *      - value is the current value of the field
  *      - data is an object passed-in when instanciating the FormChecker
  *      - opts is provided by this CoreUI instance with following keys:
@@ -36,18 +36,14 @@ export class FormChecker {
 
     // an error message returned by the check function is only considered a validity error if it is of type ERROR
     //  else keep it cool
-    _errToValid( err ){
+    _computeValid( err, field ){
         let valid = true;
-        if( err ){
-            if( err.type() === TypedMessage.Type.ERROR ){
-                valid = false;
-            } else if( err.type() === TypedMessage.Type.WARNING && this.#priv.warningIsError ){
-                valid = false;
-            } else if( err.type() === TypedMessage.Type.INFO && this.#priv.infoIsError ){
-                valid = false;
-            }
+        if( this.#priv.validfn ){
+            valid = this.#priv.validfn( err, field );
+        } else {
+            valid = !err || err.type() !== TypedMessage.C.ERROR;
         }
-        //console.debug( 'err', err, 'valid', valid );
+        //console.debug( 'err', err, 'field', field, 'valid', valid );
         return valid;
     }
 
@@ -99,13 +95,14 @@ export class FormChecker {
      * Constructor
      * @param {Object} o an object with following keys:
      *  - instance: the calling template instance
-     *  - collection: the collection object, or any object which holds the check_<field> functions
+     *  - collection: an object which holds the check_<field> functions
      *  - fields: a hash which defines the fields to be checked, where:
      *      <key> must be the name of the field in the collection schema
      *      <value> is a hash wih following keys:
-     *          - js: the jQuery CSS selector for the INPUT/SELECT field in the DOM
+     *          - js: the jQuery CSS selector for the INPUT/SELECT/TEXTAREA field in the DOM
      *          - display: whether the field should be updated to show valid|invalid state, default to true
      *          - val: a function to get the value from the provided item, defaulting to just getting the field value
+     *          - post: a function to be called after with the TypedMessage result of the corresponding check_<field>() collection function
      *  - $ok: if set, the jQuery object which defines the OK button (to enable/disable it)
      *  - okfn: if set, a function to be called when OK button must enabled / disabled
      *  - $err: if set, the jQuery object which defines the error message place
@@ -113,8 +110,8 @@ export class FormChecker {
      *  - errclear: if set, a function to be called to clear all messages
      *  - data: if set, an object which will be passed to every check_<fn> collection function
      *  - useBootstrapValidationClasses: defaulting to false
-     *  - warningIsError: whether a warning should return an invalid state, defaulting to false
-     *  - infoIsError: whether an info should return an invalid state, defaulting to false
+     *  - validfn: if set, a function which computes the validity status of the form depending of the returned value of a check function
+     *      default is that only an error message is said invalid
      * @returns {FormChecker} a FormChecker object
      */
     constructor( o ){
@@ -122,7 +119,6 @@ export class FormChecker {
         //console.debug( o );
         assert( o, 'expected an Object argument' );
         assert( o.instance instanceof Blaze.TemplateInstance, 'instance is not a Blaze.TemplateInstance');
-        //assert( o.collection instanceof Mongo.Collection, 'collection is not a Mongo.Collection' );
         assert( o.collection && _.isObject( o.collection ), 'collection is not provided or not an object' );
         assert( !o.$ok || o.$ok.length > 0, 'when provided, $ok must be set to a jQuery object' );
         assert( !o.okfn || _.isFunction( o.okfn ), 'when provided, okfn must be a function' );
@@ -144,18 +140,11 @@ export class FormChecker {
             errclear: o.errclear || null,
             data: o.data || {},
             useBootstrapValidationClasses: false,
-            warningIsError: false,
-            infoIsError: false,
+            validfn: o.validfn || null,
             valid: new ReactiveVar( false )
         };
         if( _.isBoolean( o.useBootstrapValidationClasses )){
             this.#priv.useBootstrapValidationClasses = o.useBootstrapValidationClasses;
-        }
-        if( _.isBoolean( o.warningIsError )){
-            this.#priv.warningIsError = o.warningIsError;
-        }
-        if( _.isBoolean( o.infoIsError )){
-            this.#priv.infoIsError = o.infoIsError;
         }
 
         // define an autorun which will enable/disable the OK button depending of the validity status
@@ -169,10 +158,10 @@ export class FormChecker {
             }
         });
 
-        // for each field to be checked, define its own check function
-        //  this individual check function will always call the corresponding collection function
+        // for each field to be checked, define its own internal check function
+        //  this individual check function will always call the corresponding collection function (if exists)
         //  returns a Promise which resolve to 'valid' status for the field
-        // cautious: the collection check_<field>() returns a Promise which resolves to an error message or null
+        // Reminder: the collection check_<field>() is expected to return a Promise which resolves to a TypedMessage or null
         //  while this check_<field() returns a Promise which resolves to a validity Boolean
         Object.keys( o.fields ).every(( f ) => {
             const fn = 'check_'+f;
@@ -182,11 +171,14 @@ export class FormChecker {
                 return self.#priv.collection[fn]( value, self.#priv.data, opts )
                     .then(( err ) => {
                         //console.debug( f, err );
-                        const valid = this._errToValid( err );
+                        const valid = this._computeValid( err, f );
                         if( err ){
                             this._pushMessage( err );
                         }
                         self.#priv.valid.set( valid );
+                        if( o.fields[f].post ){
+                            o.fields[f].post( err );
+                        }
                         // set valid/invalid bootstrap classes
                         if( o.fields[f].display !== false && self.#priv.useBootstrapValidationClasses === true ){
                             o.instance.$( o.fields[f].js ).addClass( valid ? 'is-valid' : 'is-invalid' );
@@ -243,6 +235,10 @@ export class FormChecker {
             self.#priv.instance.$( self.#priv.fields[f].js ).removeClass( 'is-valid is-invalid' );
             return true;
         });
+        // also clears the error messages if any
+        if( self.#priv.errclear ){
+            self.#priv.errclear();
+        }
     }
 
     /**
@@ -275,20 +271,26 @@ export class FormChecker {
      * 2. if ok, we check all fields (but this one)
      * 
      * @returns {Promise} which eventually resolves to the validity status (of the single current field if false, of the whole form else)
+     * @throws Reject the Promise if the field has not been defined (probably this event is not handled by the form)
      */
     inputHandler( event ){
         const field = this.#priv.instance.$( event.target ).data( 'core-ui-form-checker' );
         if( this.#priv.errclear ){
             this.#priv.errclear();
         }
-        return field ? this[ 'check_'+field ]()
-            .then(( valid ) => {
-                if( valid ){
-                    return this.check({ field: field, update: false });
-                } else {
-                    return false;
-                }
-            }) : Promise.resolve( null );
+        if( !field || !this[ 'check_'+field ] ){
+            return Promise.reject( new Error( 'field is null or not defined in this form' ));
+        } else {
+            event.originalEvent['pwix:core-ui'] = { handled: true };
+            return this[ 'check_'+field ]()
+                .then(( valid ) => {
+                    if( valid ){
+                        return this.check({ field: field, update: false });
+                    } else {
+                        return false;
+                    }
+                });
+        }
     }
 
     /**
