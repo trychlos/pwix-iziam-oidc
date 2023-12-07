@@ -132,6 +132,18 @@ export class Page {
         }
     }
 
+    // check that the (optional) value is an object or a function
+    //  set the default value if provided
+    _checkObjectOrFunction( o, key, defValue=null ){
+        if( Object.keys( o ).includes( key )){
+            if( !Match.test( o[key], Object ) && !Match.test( o[key], Function )){
+                throw new Error( key+' is not an object nor a function' );
+            }
+        } else if( defValue ){
+            o[key] = defValue;
+        }
+    }
+
     // public data
 
     /**
@@ -153,7 +165,7 @@ export class Page {
         this._checkStringOrArray( def, 'rolesEdit', [ CoreUI._conf.adminRole ] );
         this._checkString( def, 'route' );
         this._checkString( def, 'template' );
-        this._checkObject( def, 'templateParms' );
+        this._checkObjectOrFunction( def, 'templateParms' );
         this._checkString( def, 'theme', CoreUI._conf.theme );
         this._checkBoolean( def, 'wantEditionSwitch', false );
 

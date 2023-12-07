@@ -15,10 +15,15 @@
  *  - The class defines:
  *      - a local 'check_<field>( [opts] })' function for each field which returns a Promise which resolves to a validity boolean for the relevant field
  *      - a local 'check( [opts] )' function which returns a Promise which resolves to a validity boolean for the whole form.
+ * 
+ * Note:
+ * - 'collection' should be renamed 'checks' as this only what we care of here
  */
 
 import _ from 'lodash';
 const assert = require( 'assert' ).strict; // up to nodejs v16.x
+
+import { ReactiveVar } from 'meteor/reactive-var';
 
 import { TypedMessage } from '../../common/classes/typed-message.class.js';
 
@@ -33,6 +38,31 @@ export class FormChecker {
     #priv = null;
 
     // private methods
+
+    // compute the checked type (in the sense of FieldCheck)
+    _computeCheck( err, field ){
+        let check = 'NONE';
+        if( err ){
+            switch( err.type()){
+                case TypedMessage.C.ERROR:
+                    check = 'INVALID';
+                    break;
+                case TypedMessage.C.WARNING:
+                    check = 'UNCOMPLETE';
+                    break;
+            }
+        } else if( this.#priv.fields[field].type ){
+            switch( this.#priv.fields[field].type ){
+                case 'INFO':
+                    check = 'NONE';
+                    break;
+                default:
+                    check = 'VALID';
+                    break
+            }
+        }
+        return check;
+    }
 
     // an error message returned by the check function is only considered a validity error if it is of type ERROR
     //  else keep it cool
@@ -163,30 +193,49 @@ export class FormChecker {
         //  returns a Promise which resolve to 'valid' status for the field
         // Reminder: the collection check_<field>() is expected to return a Promise which resolves to a TypedMessage or null
         //  while this check_<field() returns a Promise which resolves to a validity Boolean
+        // + attach ReactiveVar's to the field definition:
+        //   - value: the individual value got from the form
+        //   - checked: the individual checked type (in the sense of FieldCheck class)
         Object.keys( o.fields ).every(( f ) => {
             const fn = 'check_'+f;
+            if( Meteor.isDevelopment ){
+                if( !_.isFunction( self.#priv.collection[fn] )){
+                    console.warn( '[DEV] \''+fn+'()\' is not a function' );
+                }
+            }
+            o.fields[f].CoreUI = {
+                value: new ReactiveVar( null ),
+                checked: new ReactiveVar( null )
+            };
             self[fn] = function( opts={} ){
                 o.instance.$( o.fields[f].js ).removeClass( 'is-valid is-invalid' );
                 const value = this._valueFrom( f );
-                return self.#priv.collection[fn]( value, self.#priv.data, opts )
+                o.fields[f].CoreUI.value.set( value );
+                return Promise.resolve( true )
+                    .then(() => {
+                        return _.isFunction( self.#priv.collection[fn] ) ? self.#priv.collection[fn]( value, self.#priv.data, opts ) : null;
+                    })
                     .then(( err ) => {
                         //console.debug( f, err );
                         const valid = this._computeValid( err, f );
+                        self.#priv.valid.set( valid );
+                        // manage different err types
                         if( err ){
                             this._pushMessage( err );
                         }
-                        self.#priv.valid.set( valid );
                         if( o.fields[f].post ){
                             o.fields[f].post( err );
                         }
+                        const checked_type = this._computeCheck( err, f );
+                        o.fields[f].CoreUI.checked.set( checked_type );
                         // set valid/invalid bootstrap classes
                         if( o.fields[f].display !== false && self.#priv.useBootstrapValidationClasses === true ){
                             o.instance.$( o.fields[f].js ).addClass( valid ? 'is-valid' : 'is-invalid' );
                         }
-                        return Promise.resolve( valid );
+                        return valid;
                     });
             };
-            o.instance.$( o.fields[f].js ).data( 'core-ui-form-checker', f );
+            o.instance.$( o.fields[f].js ).data( 'form-checker', f );
             //console.debug( o.fields[f], o.instance.$( o.fields[f].js )[0], o.instance.$( o.fields[f].js ));
             //  o.instance.$( o.fields[f].js )[0].nodeName === 'SELECT'
             return true;
@@ -242,6 +291,14 @@ export class FormChecker {
     }
 
     /**
+     * @param {String} field the name of the field we are interested of
+     * @returns {String} the corresponding current FieldCheck type
+     */
+    getFieldCheck( field ){
+        return this.#priv.fields[field].CoreUI.checked.get();
+    }
+
+    /**
      * @returns {Object} data
      */
     getData(){
@@ -274,14 +331,15 @@ export class FormChecker {
      * @throws Reject the Promise if the field has not been defined (probably this event is not handled by the form)
      */
     inputHandler( event ){
-        const field = this.#priv.instance.$( event.target ).data( 'core-ui-form-checker' );
+        const field = this.#priv.instance.$( event.target ).data( 'form-checker' );
         if( this.#priv.errclear ){
             this.#priv.errclear();
         }
         if( !field || !this[ 'check_'+field ] ){
-            return Promise.reject( new Error( 'field is null or not defined in this form' ));
+            //return Promise.reject( new Error( 'field is null or not defined in this form' ));
+            return Promise.resolve( null );
         } else {
-            event.originalEvent['pwix:core-ui'] = { handled: true };
+            event.originalEvent['FormChecker'] = { handled: true };
             return this[ 'check_'+field ]()
                 .then(( valid ) => {
                     if( valid ){

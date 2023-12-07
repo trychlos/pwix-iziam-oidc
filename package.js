@@ -41,6 +41,7 @@ function configure( api ){
     api.use( 'pwix:i18n@1.5.2' );
     api.use( 'pwix:roles@1.1.3' );
     api.use( 'pwix:tolert@1.4.0' );
+    api.use( 'reactive-var' );
     api.use( 'tmeasday:check-npm-versions@1.0.2', 'server' );
     api.use( 'tracker', 'client' );
     api.addFiles( 'src/client/components/coreCookiesLink/coreCookiesLink.js', 'client' );

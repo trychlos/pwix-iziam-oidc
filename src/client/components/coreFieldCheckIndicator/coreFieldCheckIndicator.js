@@ -8,6 +8,7 @@
  * 
  * Parms:
  *  - type: a FieldCheck constant as INVALID, NONE, UNCOMPLETE or VALID
+ *  - classes: if set, a list of classes to be added to the default
  */
 
 import { FieldCheck } from '../../classes/field-check.class.js';

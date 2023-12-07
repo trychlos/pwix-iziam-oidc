@@ -2,7 +2,7 @@
     <div class="core-field-check-indicator">
 
         {{#each it in itemsList }}
-            <span class="{{ itClass it }} display-class" data-type="{{ it }}" title="{{ itTitle it }}">
+            <span class="{{ itClass it }} {{ classes }} display-class" data-type="{{ it }}" title="{{ itTitle it }}">
                 <span class="fa-solid fa-fw {{ itIcon it }}"></span>
             </span>
         {{/each}}
