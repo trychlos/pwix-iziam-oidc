@@ -220,7 +220,7 @@ export class FormChecker {
                         const valid = this._computeValid( err, f );
                         self.#priv.valid.set( valid );
                         // manage different err types
-                        if( err ){
+                        if( err && opts.msgerr !== false ){
                             this._pushMessage( err );
                         }
                         if( o.fields[f].post ){
@@ -250,6 +250,7 @@ export class FormChecker {
      * @param {Object} opts an option object with following keys:
      *  - field: if set, indicates a field to not check (as just already validated from an input handler)
      *  - display: if set, then says whether checks have any effect on the display, defaulting to true
+     *  - msgerr: if set, says if error message are accepted, defaulting to true
      *  - update: if set, then says whether the value found in the form should update the edited object, defaulting to true
      * @returns a Promise which eventually resolves to the global validity status
      */
@@ -295,7 +296,11 @@ export class FormChecker {
      * @returns {String} the corresponding current FieldCheck type
      */
     getFieldCheck( field ){
-        return this.#priv.fields[field].CoreUI.checked.get();
+        if( !this.#priv.fields[field] ){
+            console.warn( 'unintialized', field );
+        } else {
+            return this.#priv.fields[field].CoreUI.checked.get();
+        }
     }
 
     /**

@@ -11,6 +11,7 @@
 import { FieldType } from '../../classes/field-type.class.js';
 
 import './coreFieldTypeIndicator.html';
+import './coreFieldTypeIndicator.less';
 
 Template.coreFieldTypeIndicator.helpers({
     // a class which encapsulates the icon 

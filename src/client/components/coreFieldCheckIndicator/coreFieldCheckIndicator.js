@@ -14,6 +14,7 @@
 import { FieldCheck } from '../../classes/field-check.class.js';
 
 import './coreFieldCheckIndicator.html';
+import './coreFieldCheckIndicator.less';
 
 Template.coreFieldCheckIndicator.onRendered( function(){
     const self = this;
