@@ -130,10 +130,20 @@ body {
     .x-w100 {
         width: 100%;
     }
-    // this width considers YYYY-MM-DD + valid coche
+    // this width is fine for input YYYY-MM-DD
     .x-wdate {
+        min-width: 7.5em;
+        max-width: 7.5em;
+    }
+    // this width considers YYYY-MM-DD + valid coche from Bootstrap classes
+    .x-wdate-coched {
         min-width: 8.5em;
         max-width: 8.5em;
+    }
+    // this width considers YYYY-MM-DD + valid coche from Bootstrap classes
+    .x-wdate-th {
+        min-width: 8.25em;
+        max-width: 8.25em;
     }
 }
 

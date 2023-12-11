@@ -340,8 +340,8 @@ export class FormChecker {
         if( this.#priv.errclear ){
             this.#priv.errclear();
         }
-        if( !field || !this[ 'check_'+field ] ){
-            //return Promise.reject( new Error( 'field is null or not defined in this form' ));
+        // an event addressed to another formChecker, or already handled by another FormChecker
+        if( !field || !this[ 'check_'+field ] || ( event.originalEvent['form-checker'] || {} ).handled === true ){
             return Promise.resolve( null );
         } else {
             event.originalEvent['FormChecker'] = { handled: true };
