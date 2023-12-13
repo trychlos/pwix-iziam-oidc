@@ -250,7 +250,7 @@ export class FormChecker {
      * @param {Object} opts an option object with following keys:
      *  - field: if set, indicates a field to not check (as just already validated from an input handler)
      *  - display: if set, then says whether checks have any effect on the display, defaulting to true
-     *  - msgerr: if set, says if error message are accepted, defaulting to true
+     *  - msgerr: if set, says if error message are to be displayed, defaulting to true
      *  - update: if set, then says whether the value found in the form should update the edited object, defaulting to true
      * @returns a Promise which eventually resolves to the global validity status
      */
