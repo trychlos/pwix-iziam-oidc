@@ -12,7 +12,10 @@
 | ---: | :---       | :---                       |
 |    9 | 2023- 9- 6 | Integrate legals, cgu, personal policy as templates + relevant links |
 |   11 | 2023- 9-28 | env-settings: package configuration is re-run when language changes - why? |
-|   12 |  |  |
+|   12 | 2023-12-16 | rename package to CoreAPP as there is not only a UI here |
+|   14 | 2023-12-16 | PageCurrent. editAllowed() accessAllowed() should be able to take functions as arguments |
+|   15 | 2023-12-16 | have a component able to build a menu from allowed pages ? |
+|   16 |  |  |
 
 ---
 ## Done

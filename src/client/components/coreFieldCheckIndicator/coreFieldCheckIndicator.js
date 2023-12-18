@@ -9,6 +9,7 @@
  * Parms:
  *  - type: a FieldCheck constant as INVALID, NONE, UNCOMPLETE or VALID
  *  - classes: if set, a list of classes to be added to the default
+ *  - title: if set, a text to replace the default title
  */
 
 import { FieldCheck } from '../../classes/field-check.class.js';
@@ -40,7 +41,7 @@ Template.coreFieldCheckIndicator.helpers({
     // a class which encapsulates the icon 
     //  determines the color through the stylesheet
     itTitle( it ){
-        return FieldCheck.title( it );
+        return this.title ? this.title : FieldCheck.title( it );
     },
 
     // list of known types

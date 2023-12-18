@@ -208,16 +208,19 @@ export class FormChecker {
                 checked: new ReactiveVar( null )
             };
             self[fn] = function( opts={} ){
+                //console.debug( 'FormChecker.'+fn+'()' );
                 o.instance.$( o.fields[f].js ).removeClass( 'is-valid is-invalid' );
                 const value = this._valueFrom( f );
                 o.fields[f].CoreUI.value.set( value );
                 return Promise.resolve( true )
                     .then(() => {
-                        return _.isFunction( self.#priv.collection[fn] ) ? self.#priv.collection[fn]( value, self.#priv.data, opts ) : null;
+                        const ret = _.isFunction( self.#priv.collection[fn] ) ? self.#priv.collection[fn]( value, self.#priv.data, opts ) : null;
+                        //console.debug( fn, 'ret', ret );
+                        return ret;
                     })
                     .then(( err ) => {
-                        //console.debug( f, err );
                         const valid = this._computeValid( err, f );
+                        //console.debug( fn, 'err', err, 'valid', valid );
                         self.#priv.valid.set( valid );
                         // manage different err types
                         if( err && opts.msgerr !== false ){
@@ -227,6 +230,7 @@ export class FormChecker {
                             o.fields[f].post( err );
                         }
                         const checked_type = this._computeCheck( err, f );
+                        //console.debug( f, 'err', err, 'checked_type', checked_type );
                         o.fields[f].CoreUI.checked.set( checked_type );
                         // set valid/invalid bootstrap classes
                         if( o.fields[f].display !== false && self.#priv.useBootstrapValidationClasses === true ){
@@ -299,7 +303,9 @@ export class FormChecker {
         if( !this.#priv.fields[field] ){
             console.warn( 'unintialized', field );
         } else {
-            return this.#priv.fields[field].CoreUI.checked.get();
+            const ret = this.#priv.fields[field].CoreUI.checked.get();
+            //console.debug( 'getFieldCheck()', field, ret );
+            return ret;
         }
     }
 
@@ -363,6 +369,19 @@ export class FormChecker {
     setData( data ){
         //console.debug( 'setData()', data );
         this.#priv.data = data || {};
+    }
+
+    /**
+     * @summary set a form field
+     * @param {String} field
+     * @param {Object} item
+     */
+    setField( field, item ){
+        if( !this[ 'check_'+field ] ){
+            console.warn( field, 'unknown field' );
+        } else {
+            this._valueTo( field, item );
+        }
     }
 
     /**
