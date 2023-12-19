@@ -15,7 +15,7 @@
 |   12 | 2023-12-16 | rename package to CoreAPP as there is not only a UI here |
 |   14 | 2023-12-16 | PageCurrent. editAllowed() accessAllowed() should be able to take functions as arguments |
 |   15 | 2023-12-16 | have a component able to build a menu from allowed pages ? |
-|   16 |  |  |
+|   17 |  |  |
 
 ---
 ## Done
@@ -40,6 +40,8 @@
 |      | 2023- 9- 7 | done |
 |   10 | 2023- 9-12 | back meteor to 2.9.0 |
 |      | 2023- 9-28 | done |
+|   16 | 2023-12-19 | after having integrated yesno_select, remove FormChecked corresponding bad hack |
+|      | 2023-12-19 | done |
 
 ---
 P. Wieser

@@ -1,0 +1,14 @@
+<template name="coreYesnoSelect">
+    <div class="core-yesno-select">
+
+        <select class="form-select" title="{{ title }}">
+            {{#unless hasCurrent }}
+                <option value="" selected disabled>{{ i18n key="yesno.select_text" }}</option>
+            {{/unless}}
+            {{#each it in itemsList }}
+                <option value="{{ itId it }}" {{ itSelected it }}>{{ itLabel it }}</option>
+            {{/each}}
+        </select>
+
+    </div>
+</template>

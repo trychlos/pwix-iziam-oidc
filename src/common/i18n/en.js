@@ -34,6 +34,11 @@ CoreUI.i18n = {
             legalslink: {
                 label: 'Legals Informations',
                 title: 'Legals Informations'
+            },
+            yesno: {
+                no_short: 'No',
+                select_text: '',
+                yes_short: 'Yes'
             }
         }
     }

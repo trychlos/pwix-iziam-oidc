@@ -25,6 +25,8 @@ const assert = require( 'assert' ).strict; // up to nodejs v16.x
 
 import { ReactiveVar } from 'meteor/reactive-var';
 
+import { YesNo } from '../../common/definitions/yesno.def.js';
+
 import { TypedMessage } from '../../common/classes/typed-message.class.js';
 
 export class FormChecker {
@@ -98,7 +100,14 @@ export class FormChecker {
         if( tagName === 'INPUT' && eltType === 'checkbox' ){
             value = $elt.prop( 'checked' );
         } else {
-            value = this.#priv.instance.$( this.#priv.fields[field].js ).val() || '';
+            value = $elt.val() || '';
+            // a small hack to handle 'true' and 'false' values from coreYesnoSelect
+            const $select = $elt.closest( '.core-yesno-select' );
+            if( $select.length ){
+                if( value === 'true' || value === 'false' ){
+                    value = ( value === 'true' );
+                }
+            }
         }
         return value;
     }
@@ -113,7 +122,13 @@ export class FormChecker {
         if( tagName === 'INPUT' && eltType === 'checkbox' ){
             $elt.prop( 'checked', value );
         } else {
-            $elt.val( value );
+            const $select = $elt.closest( '.core-yesno-select' );
+            if( $select.length ){
+                const def = YesNo.byValue( value );
+                $elt.val( YesNo.id( def ));
+            } else {
+                $elt.val( value );
+            }
         }
     }
 

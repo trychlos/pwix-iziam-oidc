@@ -35,6 +35,11 @@ CoreUI.i18n = {
                 label: 'Mentions légales',
                 title: 'Mentions légales'
             },
+            yesno: {
+                no_short: 'Non',
+                select_text: '',
+                yes_short: 'Oui'
+            },
         }
     }
 };
