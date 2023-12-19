@@ -1,14 +1,12 @@
 /*
- * /src/client/classes/field-type.class.js
+ * pwix:core-ui/src/common/definitions/field-type.def.js
  */
 
 import { pwixI18n } from 'meteor/pwix:i18n';
 
-export class FieldType {
+export const FieldType = {
 
-    // static data
-
-    static Defs = {
+    C: {
         INFO: {
             class: 'fti-info',
             icon: 'fa-info',
@@ -24,60 +22,38 @@ export class FieldType {
             icon: 'fa-person-digging',
             title: 'field_type.work_title'
         }
-    };
-
-    // static methods
+    },
 
     // check that the type is known
-    static _byType( type ){
-        if( !Object.keys( FieldType.Defs ).includes( type )){
+    _byType( type ){
+        if( !Object.keys( FieldType.C ).includes( type )){
             console.warn( 'FieldType: unknown type', type );
             return null;
         }
-        return FieldType.Defs[type];
-    }
+        return FieldType.C[type];
+    },
 
     /**
      * @returns {String} the classes associated with this type
      */
-    static classes( type ){
+    classes( type ){
         const o = FieldType._byType( type );
         return o ? o.class : null;
-    }
+    },
 
     /**
      * @returns {String} the name of the icon associated with this type
      */
-    static icon( type ){
+    icon( type ){
         const o = FieldType._byType( type );
         return o ? o.icon : '';
-    }
+    },
 
     /**
      * @returns {String} the title associated with this type
      */
-    static title( type ){
+    title( type ){
         const o = FieldType._byType( type );
         return o && o.title ? pwixI18n.label( I18N, o.title ) : '';
     }
-
-    // private data
-
-    //#priv = null;
-
-    // private methods
-
-    // public data
-
-    /*
-     * Constructor
-     * @param {Object} o the configuration object
-     * @returns {FieldType} this instance
-     */
-    /*
-    constructor( o ){
-        this.#priv = { ...o };
-        return this;
-    }
-    */
-}
+};

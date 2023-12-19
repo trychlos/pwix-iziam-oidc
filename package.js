@@ -51,7 +51,6 @@ function configure( api ){
     api.addFiles( 'src/client/components/coreGTULink/coreGTULink.js', 'client' );
     api.addFiles( 'src/client/components/coreLegalsLink/coreLegalsLink.js', 'client' );
     api.addFiles( 'src/client/components/coreYesnoSelect/coreYesnoSelect.js', 'client' );
-    api.addFiles( 'src/common/definitions/yesno.def.js', [ 'client', 'server' ] );
     api.addAssets([
         'src/client/icons/external-link-black.png',
         'src/client/icons/external-link-white.png',

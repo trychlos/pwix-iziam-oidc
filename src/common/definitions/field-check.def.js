@@ -1,14 +1,12 @@
 /*
- * /src/client/classes/field-check.class.js
+ * pwix:core-ui/src/common/definitions/field-check.def.js
  */
 
 import { pwixI18n } from 'meteor/pwix:i18n';
 
-export class FieldCheck {
+export const FieldCheck = {
 
-    // static data
-
-    static Defs = {
+    C: {
         INVALID: {
             class: 'fci-invalid',
             icon: 'fa-xmark',
@@ -29,67 +27,45 @@ export class FieldCheck {
             icon: 'fa-check',
             title: 'field_check.valid_title'
         }
-    };
-
-    // static methods
+    },
 
     // check that the type is known
-    static _byType( type ){
-        if( !Object.keys( FieldCheck.Defs ).includes( type )){
+    _byType( type ){
+        if( !Object.keys( FieldCheck.C ).includes( type )){
             console.warn( 'FieldCheck: unknown type', type );
             return null;
         }
-        return FieldCheck.Defs[type];
-    }
+        return FieldCheck.C[type];
+    },
 
     /**
      * @returns {Array} the list of defined check types
      */
-    static Knowns(){
-        return Object.keys( FieldCheck.Defs );
-    }
+    Knowns(){
+        return Object.keys( FieldCheck.C );
+    },
 
     /**
      * @returns {String} the classes associated with this type
      */
-    static classes( type ){
+    classes( type ){
         const o = FieldCheck._byType( type );
         return o ? o.class : null;
-    }
+    },
 
     /**
      * @returns {String} the name of the icon associated with this type
      */
-    static icon( type ){
+    icon( type ){
         const o = FieldCheck._byType( type );
         return o ? o.icon : '';
-    }
+    },
 
     /**
      * @returns {String} the title associated with this type
      */
-    static title( type ){
+    title( type ){
         const o = FieldCheck._byType( type );
         return o && o.title ? pwixI18n.label( I18N, o.title ) : '';
     }
-
-    // private data
-
-    //#priv = null;
-
-    // private methods
-
-    // public data
-
-    /*
-     * Constructor
-     * @param {Object} o the configuration object
-     * @returns {FieldCheck} this instance
-     */
-    /*
-    constructor( o ){
-        this.#priv = { ...o };
-        return this;
-    }
-    */
 }

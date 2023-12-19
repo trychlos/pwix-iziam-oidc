@@ -3,7 +3,7 @@
  *
  * A small icon indicator to exhibit the result of the check of the field.
  * 
- * Note: FontAwesome displays its icons by replacing the <span>...</span> element by a svg. As a consequence, the icon cannot be dynanmically replaced.
+ * Note: FontAwesome displays its icons by replacing the <span>...</span> element by a svg. As a consequence, the icon cannot be dynamically replaced.
  *  We have to display all icon elements, only making visible the one we are interested in.
  * 
  * Parms:

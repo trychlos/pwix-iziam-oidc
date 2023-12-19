@@ -6,9 +6,10 @@
  * Parms:
  *  - type: a value from FieldType class: INFO, SAVE or WORK
  *  - classes: if set, a list of classes to be added to the default
+ *  - title: if set, a title to replace the default one
  */
 
-import { FieldType } from '../../classes/field-type.class.js';
+import { FieldType } from '../../../common/definitions/field-type.def.js';
 
 import './coreFieldTypeIndicator.html';
 import './coreFieldTypeIndicator.less';
