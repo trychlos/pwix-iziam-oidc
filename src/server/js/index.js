@@ -1,8 +1,7 @@
 /*
- * pwix:core-ui/src/server/js/index.js
+ * pwix:iziam/src/server/js/index.js
  */
 
 import '../../common/js/index.js';
 
 import './check_npms.js';
-import './collections.js';

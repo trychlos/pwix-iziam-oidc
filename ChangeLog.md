@@ -1,4 +1,4 @@
-# pwix:core-ui
+# pwix:iziam
 
 ## ChangeLog
 

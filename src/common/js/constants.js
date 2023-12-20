@@ -1,16 +1,15 @@
 /*
- * pwix:core-ui/src/common/js/constants.js
+ * pwix:iziam/src/common/js/constants.js
  */
 
-CoreUI.C = {
+izIAM.C = {
     // verbosity levels
     Verbose: {
         NONE: 0,
-        CONFIGURE: 0x01 <<  0,
-        PAGE:      0x01 <<  1,
+        CONFIGURE: 0x01 <<  0
     }
 };
 
 // non exported variables
 
-I18N = 'pwix:core-ui:i18n:namespace';
+I18N = 'pwix:iziam:i18n:namespace';

@@ -1,17 +1,13 @@
 /*
- * pwix:core-ui/src/common/js/configure.js
+ * pwix:iziam/src/common/js/configure.js
  */
 
 import _ from 'lodash';
 
-CoreUI._conf = {};
+izIAM._conf = {};
 
-CoreUI._defaults = {
-    adminRole: 'APP_ADMINISTRATOR',
-    menuIcon: 'fa-chevron-right',
-    routePrefix: '/coreUI',
-    theme: 't-page',
-    verbosity: CoreUI.C.Verbose.NONE
+izIAM._defaults = {
+    verbosity: izIAM.C.Verbose.NONE
 };
 
 /**
@@ -20,17 +16,17 @@ CoreUI._defaults = {
  * @param {Object} o configuration options
  * @returns {Object} the package configuration
  */
-CoreUI.configure = function( o ){
+izIAM.configure = function( o ){
     if( o && _.isObject( o )){
-        _.merge( CoreUI._conf, CoreUI._defaults, o );
+        _.merge( izIAM._conf, izIAM._defaults, o );
         // be verbose if asked for
-        if( CoreUI._conf.verbosity & CoreUI.C.Verbose.CONFIGURE ){
-            //console.log( 'pwix:core-ui configure() with', o, 'building', CoreUI._conf );
-            console.log( 'pwix:core-ui configure() with', o );
+        if( izIAM._conf.verbosity & izIAM.C.Verbose.CONFIGURE ){
+            //console.log( 'pwix:iziam configure() with', o, 'building', izIAM._conf );
+            console.log( 'pwix:iziam configure() with', o );
         }
     }
     // also acts as a getter
-    return CoreUI._conf;
+    return izIAM._conf;
 }
 
-_.merge( CoreUI._conf, CoreUI._defaults );
+_.merge( izIAM._conf, izIAM._defaults );
