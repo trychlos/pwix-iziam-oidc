@@ -6,6 +6,7 @@
  * Parms:
  * - selected: the current boolean value
  * - title: the title to be attributed to the select element
+ * - enabled: a boolean value which says if the element is enabled, defaulting to true
  * 
  * Events:
  *  - 'yesno-selected' with { value: true|false, id:<id> }
@@ -21,6 +22,11 @@ import './coreYesnoSelect.html';
 import './coreYesnoSelect.less';
 
 Template.coreYesnoSelect.helpers({
+    // whether the element is enabled ?
+    disabled(){
+        return this.enabled === false ? 'disabled' : '';
+    },
+
     // whether we have a currently selected value ?
     hasCurrent(){
         return _.isBoolean( this.selected );

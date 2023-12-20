@@ -125,7 +125,9 @@ export class FormChecker {
             const $select = $elt.closest( '.core-yesno-select' );
             if( $select.length ){
                 const def = YesNo.byValue( value );
-                $elt.val( YesNo.id( def ));
+                if( def ){
+                    $elt.val( YesNo.id( def ));
+                }
             } else {
                 $elt.val( value );
             }

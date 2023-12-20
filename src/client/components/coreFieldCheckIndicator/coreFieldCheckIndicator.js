@@ -12,7 +12,7 @@
  *  - title: if set, a text to replace the default title
  */
 
-import { FieldCheck } from '../../classes/field-check.class.js';
+import { FieldCheck } from '../../../common/definitions/field-check.def.js';
 
 import './coreFieldCheckIndicator.html';
 import './coreFieldCheckIndicator.less';
