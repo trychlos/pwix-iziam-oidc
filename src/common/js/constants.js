@@ -3,7 +3,7 @@
  */
 
 izIAM.C = {
-    service: 'izIAM',
+    Service: 'izIAM',
 
     // verbosity levels
     Verbose: {

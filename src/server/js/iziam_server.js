@@ -1,10 +1,10 @@
 /*
- * pwix:iziam-oidc/src/client/js/iziam_server.js
+ * pwix:iziam-oidc/src/server/js/iziam_server.js
  */
 
 import _ from 'lodash';
 
-OAuth.registerService( 'iziam', 2, null, function( query ){
+OAuth.registerService( izIAM.C.Service, 2, null, function( query ){
 
     var debug = process.env.DEBUG || false;
     var token = getToken(query);
@@ -116,9 +116,9 @@ var getUserInfo = function( accessToken ){
 };
 
 var getConfiguration = function(){
-    var config = ServiceConfiguration.configurations.findOne({ service: 'iziam' });
+    var config = ServiceConfiguration.configurations.findOne({ service: izIAM.C.Service });
     if( !config ){
-        throw new ServiceConfiguration.ConfigError( 'Service oidc not configured.' );
+        throw new ServiceConfiguration.ConfigError( 'Service '+izIAM.C.Service+' not configured.' );
     }
     return config;
 };

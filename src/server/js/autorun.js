@@ -9,19 +9,19 @@ import { Tracker } from 'meteor/tracker';
 // load izIAM settings from settings per environment
 Tracker.autorun(() => {
     const envSettings = CoreUI.envSettings.get();
-    if( envSettings && envSettings.settings && envSettings.settings[izIAM.C.service]  ){
+    if( envSettings && envSettings.settings && envSettings.settings[izIAM.C.Service]  ){
 
         console.debug( 'set izIAM.settings from server settings per environment' );
-        izIAM.settings = envSettings.settings[izIAM.C.service];
+        izIAM.settings = envSettings.settings[izIAM.C.Service];
 
-        if( izIAM.settings.discovery ){
-            Issuer.discover( izIAM.settings.discovery )
+        if( izIAM.settings.rootUrl ){
+            Issuer.discover( izIAM.settings.rootUrl )
                 .then(( issuer ) => {
-                    console.debug( 'set izIAM.Issuer after successful '+izIAM.C.service+' discovery' );
+                    console.debug( 'set izIAM.Issuer after successful '+izIAM.C.Service+' discovery' );
                     izIAM.Issuer = issuer;
                 });
             }
     } else {
-        console.warn( izIAM.C.service, 'configuration not available' );
+        console.warn( izIAM.C.Service, 'configuration not available' );
     }
 });
