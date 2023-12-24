@@ -4,8 +4,6 @@
 
 import { OAuth } from 'meteor/oauth';
 
-izIAM = {};
-
 // Request izIAM credentials for the user
 // @param options {optional}
 // @param credentialRequestCompleteCallback {Function} Callback function to call on

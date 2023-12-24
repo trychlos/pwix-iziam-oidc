@@ -4,8 +4,6 @@
 
 import _ from 'lodash';
 
-izIAM = {};
-
 OAuth.registerService( 'iziam', 2, null, function( query ){
 
     var debug = process.env.DEBUG || false;
