@@ -1,20 +1,13 @@
 Package.describe({
-    name: 'pwix:iziam',
+    name: 'pwix:iziam-oidc',
     version: '1.0.0-rc',
-    // Brief, one-line summary of the package.
-    summary: 'Bootstrap-based core package for user interfaces',
-    // URL to the Git repository containing the source code for this package.
-    git: '',
-    // By default, Meteor will default to using README.md for documentation.
-    // To avoid submitting documentation, set this field to null.
+    summary: 'izIAM OpenID Connect login flow',
+    git: 'https://github.com/trychlos/pwix-iziam-oidc.git',
     documentation: 'README.md'
 });
 
 Package.onUse( function( api ){
     configure( api );
-    api.export([
-        'izIAM'
-    ]);
     api.mainModule( 'src/client/js/index.js', 'client' );
     api.mainModule( 'src/server/js/index.js', 'server' );
 });
@@ -22,18 +15,27 @@ Package.onUse( function( api ){
 Package.onTest( function( api ){
     configure( api );
     api.use( 'tinytest' );
-    api.use( 'pwix:iziam' );
+    api.use( 'pwix:iziam-oidc' );
+    api.use( 'pwix:iziam-oidc' );
     api.mainModule( 'test/js/index.js' );
 });
 
 function configure( api ){
     api.versionsFrom( '2.9.0' );
-    api.use( 'check' );
-    api.use( 'ecmascript' );
-    api.use( 'less@4.0.0', 'client' );
+    api.export([
+        'izIAM'
+    ]);
+    api.use( 'ecmascript', ['client', 'server'] );
+    api.use( 'fetch', 'server' );
+    api.use( 'http', 'server' );
+    api.use( 'oauth', ['client', 'server'] );
+    api.use( 'oauth2', ['client', 'server'] );
+    api.use( 'pwix:core-ui' );
     api.use( 'pwix:i18n@1.5.2' );
+    api.use( 'random', 'client' );
+    api.use( 'service-configuration', ['client', 'server'] );
     api.use( 'tmeasday:check-npm-versions@1.0.2', 'server' );
-    api.addFiles( 'src/client/components/coreYesnoSelect/coreYesnoSelect.js', 'client' );
+    api.use( 'tracker' );
 }
 
 // NPM dependencies are checked in /src/server/js/check_npms.js

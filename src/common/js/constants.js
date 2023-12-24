@@ -1,8 +1,10 @@
 /*
- * pwix:iziam/src/common/js/constants.js
+ * pwix:iziam-oidc/src/common/js/constants.js
  */
 
 izIAM.C = {
+    service: 'izIAM',
+
     // verbosity levels
     Verbose: {
         NONE: 0,
@@ -12,4 +14,4 @@ izIAM.C = {
 
 // non exported variables
 
-I18N = 'pwix:iziam:i18n:namespace';
+I18N = 'pwix:iziam-oidc:i18n:namespace';
