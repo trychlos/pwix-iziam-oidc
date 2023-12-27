@@ -2,6 +2,7 @@
  * pwix:iziam-oidc/src/client/js/iziam_client.js
  */
 
+//import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 import { OAuth } from 'meteor/oauth';
 import { ServiceConfiguration } from 'meteor/service-configuration';
 
@@ -34,15 +35,25 @@ izIAM.requestCredential = ( options, credentialRequestCompleteCallback ) => {
             }
 
             const loginStyle = options.loginStyle || loginOptions.config.loginStyle;
-            const url = loginOptions.url + `&state=${OAuth._stateParam( loginStyle, loginOptions.code_challenge, options && options.redirectUrl )}`;
+            const url = loginOptions.url; // + `&state=${OAuth._stateParam( loginStyle, loginOptions.code_challenge, options && options.redirectUrl )}`;
+            //const url = loginOptions.url + `&state=${OAuth._stateParam( loginOptions.code_verifier )}`;
 
             OAuth.launchLogin({
                 loginService: izIAM.C.Service,
                 loginStyle: loginStyle,
                 loginUrl: url,
-                credentialToken: loginOptions.code_challenge,
+                //credentialToken: loginOptions.code_challenge,
                 credentialRequestCompleteCallback,
                 popupOptions: { width: 900, height: 450 }
             });
         });
 };
+
+// the redirect_uri route
+/*
+FlowRouter.route( '/cb', {
+    action(){
+        console.log( '/cb', FlowRouter.current());
+    },
+});
+*/

@@ -23,11 +23,11 @@ izIAM.s = {
                 idTokenWhitelistFields: [],
                 redirectUrl: izIAM.settings.redirectUrl
             };
-            console.debug( 'register.service set', set );
+            console.debug( 'register ServiceConfiguration', set );
             ServiceConfiguration.configurations.upsert({ service: izIAM.C.Service }, { $set: set });
             config = ServiceConfiguration.configurations.findOne({ service: izIAM.C.Service });
         }
-        console.debug( 'config', config );
+        console.debug( 'read ServiceConfiguration', config );
         return config;
     },
 
@@ -45,15 +45,14 @@ izIAM.s = {
             // token_endpoint_auth_method (default "client_secret_basic")
         });
 
-        let loginOptions = {};
+        const loginOptions = {};
         loginOptions.config = config;
     
-        // store the code_verifier in your framework's session mechanism
-        //  if it is a cookie based solution, it should be httpOnly (not readable by javascript) and encrypted.
-        const code_verifier = generators.codeVerifier();
-        const code_challenge = generators.codeChallenge( code_verifier );
-        loginOptions.code_verifier = code_verifier;
-        loginOptions.code_challenge = code_challenge;
+        // store the code_verifier in the 'state' parameter which is brought back in the callback
+        loginOptions.code_verifier = generators.codeVerifier();
+        loginOptions.code_challenge = generators.codeChallenge( loginOptions.code_verifier );
+        //console.debug( 'code_verifier', loginOptions.code_verifier );
+        //console.debug( 'code_challenge', loginOptions.code_challenge );
 
         // scope is a space-separated list of keywords
         //  must have at least 'openid'
@@ -62,12 +61,16 @@ izIAM.s = {
 
         const url = client.authorizationUrl({
             scope: 'openid email profile',
-            resource: 'https://my.api.example.com/resource/32178',
-            code_challenge,
+            resource: 'urn:api',
+            code_challenge: loginOptions.code_challenge,
             code_challenge_method: 'S256',
+            state: Buffer.from( loginOptions.code_verifier ).toString( 'base64' )
         });
-        console.debug( 'authorizationUrl', url );
+        //console.debug( 'authorizationUrl', url );
         loginOptions.url = url;
+
+        izIAM.serviceConfiguration = config;
+        izIAM.client = client;
 
         /*
         const credentialToken = Random.secret();

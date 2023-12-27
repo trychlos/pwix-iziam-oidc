@@ -3,6 +3,11 @@
  */
 
 izIAM = {
-    // service configuration is set in server/autorun with settings read from server settings per environment
-    // Issuer is set after successful OpenID issuer discovery
+    // server (autorun) settings read from server settings per environment
+    settings: null,
+    // server (autorun) set after successful OpenID Issuer discovery
+    Issuer: null,
+    // server (function.prepareLogin)
+    serviceConfiguration: null,
+    client: null,
 };
