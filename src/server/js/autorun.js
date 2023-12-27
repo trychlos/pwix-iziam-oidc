@@ -20,7 +20,9 @@ Tracker.autorun(() => {
                     console.debug( 'set izIAM.Issuer after successful '+izIAM.C.Service+' discovery' );
                     izIAM.Issuer = issuer;
                 });
-            }
+        } else {
+            console.warn( izIAM.C.Service, 'rootUrl is not set' );
+        }
     } else {
         console.warn( izIAM.C.Service, 'configuration not available' );
     }

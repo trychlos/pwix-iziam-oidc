@@ -6,15 +6,15 @@ import _ from 'lodash';
 
 OAuth.registerService( izIAM.C.Service, 2, null, function( query ){
 
-    var debug = process.env.DEBUG || false;
+    var debug = true; //process.env.DEBUG || false;
     var token = getToken(query);
-    if( debug ) console.log( 'XXX: register token:', token );
+    if( debug ) console.debug( 'XXX: register token:', token );
 
     var accessToken = token.access_token || token.id_token;
     var expiresAt = ( +new Date ) + ( 1000 * parseInt( token.expires_in, 10 ));
 
     var userinfo = getUserInfo( accessToken );
-    if( debug ) console.log( 'XXX: userinfo:', userinfo );
+    if( debug ) console.debug( 'XXX: userinfo:', userinfo );
 
     var serviceData = {};
     serviceData.id = userinfo[process.env.OAUTH2_ID_MAP] || userinfo[id];
@@ -32,12 +32,12 @@ OAuth.registerService( izIAM.C.Service, 2, null, function( query ){
 
     if( token.refresh_token )
         serviceData.refreshToken = token.refresh_token;
-    if( debug ) console.log( 'XXX: serviceData:', serviceData );
+    if( debug ) console.debug( 'XXX: serviceData:', serviceData );
 
     var profile = {};
     profile.name = userinfo[process.env.OAUTH2_FULLNAME_MAP] || userinfo[displayName];
     profile.email = userinfo[process.env.OAUTH2_EMAIL_MAP] || userinfo[email];
-    if( debug ) console.log( 'XXX: profile:', profile );
+    if( debug ) console.debug( 'XXX: profile:', profile );
 
     return {
         serviceData: serviceData,
@@ -82,7 +82,7 @@ var getToken = function( query ){
         // if the http response was a json object with an error attribute
         throw new Error( 'Failed to complete handshake with izIAM ' + serverTokenEndpoint + ': ' + response.data.error );
     } else {
-        if( debug ) console.log( 'XXX: getToken response: ', response.data );
+        if( debug ) console.debug( 'XXX: getToken response: ', response.data );
         return response.data;
     }
 };
@@ -103,15 +103,15 @@ var getUserInfo = function( accessToken ){
             serverUserinfoEndpoint,
             {
                 headers: {
-                "User-Agent": userAgent,
-                "Authorization": "Bearer " + accessToken
+                    "User-Agent": userAgent,
+                    "Authorization": "Bearer " + accessToken
                 }
             }
         );
     } catch( err ){
         throw _.extend( new Error( 'Failed to fetch userinfo from izIAM ' + serverUserinfoEndpoint + ': ' + err.message ), { response: err.response });
     }
-    if( debug ) console.log( 'XXX: getUserInfo response: ', response.data );
+    if( debug ) console.debug( 'XXX: getUserInfo response: ', response.data );
     return response.data;
 };
 

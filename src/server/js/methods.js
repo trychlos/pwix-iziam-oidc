@@ -11,27 +11,8 @@
  * Please note that data to be registered are available either from the settings or from the issuer, so server-side only.
  */
 
-import { ServiceConfiguration } from 'meteor/service-configuration';
-
 Meteor.methods({
-    'register.getConfig'(){
-        let config = ServiceConfiguration.configurations.findOne({ service: izIAM.C.Service });
-        if( !config ){
-            const set = {
-                loginStyle: izIAM.settings.loginStyle || 'popup',
-                clientId: izIAM.settings.clientId,
-                secret: izIAM.settings.clientSecret,
-                serverUrl: izIAM.settings.rootUrl,
-                authorizationEndpoint: izIAM.Issuer.authorization_endpoint.substring( izIAM.settings.rootUrl.length ),
-                tokenEndpoint: izIAM.Issuer.token_endpoint.substring( izIAM.settings.rootUrl.length ),
-                userinfoEndpoint: izIAM.Issuer.userinfo_endpoint.substring( izIAM.settings.rootUrl.length ),
-                idTokenWhitelistFields: []
-            };
-            console.debug( 'register.service set', set );
-            ServiceConfiguration.configurations.upsert({ service: izIAM.C.Service }, { $set: set });
-            config = ServiceConfiguration.configurations.findOne({ service: izIAM.C.Service });
-        }
-        console.debug( 'config', config );
-        return config;
+    'iziam.prepareLogin'( options ){
+        return izIAM.s.prepareLogin( options );
     }
 });
