@@ -1,5 +1,4 @@
 # pwix:iziam-oidc
-# pwix:iziam-oidc
 
 ## What is it ?
 

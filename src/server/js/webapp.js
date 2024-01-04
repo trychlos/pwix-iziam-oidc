@@ -7,11 +7,10 @@ import { WebApp } from 'meteor/webapp';
 WebApp.connectHandlers.use( '/cb', ( req, res, next ) => {
     // get an authorization code
     const params = izIAM.client.callbackParams( req );
-    console.debug( 'webapp handler: params', params );
-    const verifier = Buffer.from( params.state, 'base64' ).toString( 'ascii' );
+    const options = izIAM.s._stateDecode( params.state );
     delete params.state;
-    console.debug( 'verifier', verifier );
-    izIAM.client.callback( 'https://devel.trychlos.org/cb', params, { code_verifier: verifier })
+    console.debug( 'webapp handler:', params, options );
+    izIAM.client.callback( options.redirect, params, { code_verifier: options.verifier })
         .then(( tokenSet ) => {
             // get an access code with 'openid' scope as an object:
             //  access_token:
@@ -32,5 +31,5 @@ WebApp.connectHandlers.use( '/cb', ( req, res, next ) => {
         })
         .then(( userinfo ) => {
             console.log( 'userinfo %j', userinfo );
-        })
+        });
 });

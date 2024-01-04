@@ -3,12 +3,13 @@
  */
 
 izIAM.C = {
-    Service: 'izIAM',
+    Service: 'iziam',
 
     // verbosity levels
     Verbose: {
         NONE: 0,
-        CONFIGURE: 0x01 <<  0
+        CONFIGURE:  0x01 <<  0,
+        DEBUG:      0x01 <<  1
     }
 };
 
