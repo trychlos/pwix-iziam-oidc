@@ -75,7 +75,7 @@ izIAM.s = {
         //const flatScope = scope.map( encodeURIComponent ).join( '+' );
 
         const url = client.authorizationUrl({
-            scope: 'openid iz_profile',
+            scope: 'openid iz_profile offline_access',
             resource: izIAM.settings.resource,
             code_challenge: loginOptions.code_challenge,
             code_challenge_method: 'S256',

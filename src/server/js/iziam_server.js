@@ -61,10 +61,9 @@ OAuth.registerService( izIAM.C.Service, 2, null, function( query ){
         console.log( 'userinfo %j', userinfo );
 
         let serviceData = userinfo;
-        //serviceData.id = userinfo[process.env.OAUTH2_ID_MAP] || userinfo[id];
-        //serviceData.username = userinfo[process.env.OAUTH2_USERNAME_MAP] || userinfo[uid];
-        //serviceData.fullname = userinfo[process.env.OAUTH2_FULLNAME_MAP] || userinfo[displayName];
+        serviceData.id = userinfo.sub;
         serviceData.accessToken = tokenSet.access_token;
+        serviceData.refreshToken = tokenSet.refresh_token;
         serviceData.expiresAt = tokenSet.expires_at;
         //serviceData.email = userinfo[process.env.OAUTH2_EMAIL_MAP] || userinfo[email];
         //serviceData.sub = userInfo.sub;
@@ -269,4 +268,3 @@ izIAM.retrieveCredential = function( credentialToken, credentialSecret ){
     console.debug( '** in izIAM.retrieveCredential()' );
     return OAuth.retrieveCredential( credentialToken, credentialSecret );
 };
-//
