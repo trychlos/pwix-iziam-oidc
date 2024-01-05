@@ -2,12 +2,51 @@
  * pwix:iziam-oidc/src/server/js/functions.js
  */
 
-import { generators } from 'openid-client';
+import _ from 'lodash';
+import { generators, Issuer } from 'openid-client';
 
 import { Random } from 'meteor/random';
 import { ServiceConfiguration } from 'meteor/service-configuration';
 
 izIAM.s = {
+    // make sure that provided scopes are single-spaces separated and appear only once
+    //  @param {String|Array<String>} a list of scopes
+    //  @param {String} a string of each scope appears only once
+    checkScopes( a ){
+        const b = _.isArray( a ) ? a : [ a ];   // be sure to have an array of strings
+        let c = {};
+        ( b || [] ).every(( d ) => {            // explore array
+            const e = d.split( /\s+/ );         // be sure to have an array of single words
+            ( e || [] ).every(( f ) => {        // and for each word...
+                c[f] = true;
+                return true;
+            });
+            return true;
+        });
+        return Object.keys( c ).join( ' ' );
+    },
+
+    // try to discover the OpenID issuer
+    //  first run when envSettings are available
+    //  then retried each time a connection is requested
+    tryDiscover(){
+        if( !izIAM.Issuer ){
+            if( izIAM.settings.rootUrl ){
+                Issuer.discover( izIAM.settings.rootUrl )
+                    .then(( issuer ) => {
+                        console.debug( 'set izIAM.Issuer after successful '+izIAM.C.Service+' discovery' );
+                        izIAM.Issuer = issuer;
+                    })
+                    .catch(( e ) => {
+                        // may happen that the Issuer be temporarily unavailable - will have to retry later
+                        console.warn( e );
+                    });
+            } else {
+                console.warn( izIAM.C.Service, 'rootUrl is not set' );
+            }
+        }
+    },
+
     // return the config as read from settings and systematically set in ServiceConfiguration collection
     //  making sure to work with last version
     getConfig(){
@@ -58,21 +97,12 @@ izIAM.s = {
             client_secret: loginOptions.config.secret,
             redirect_uris: [ loginOptions.redirectUrl ],
             response_types: [ 'code' ]
-            // id_token_signed_response_alg (default "RS256")
-            // token_endpoint_auth_method (default "client_secret_basic")
         });
         console.debug( 'client', client );
 
         // store the code_verifier in the 'state' parameter which is brought back in the callback
         loginOptions.code_verifier = generators.codeVerifier();
         loginOptions.code_challenge = generators.codeChallenge( loginOptions.code_verifier );
-        //console.debug( 'code_verifier', loginOptions.code_verifier );
-        //console.debug( 'code_challenge', loginOptions.code_challenge );
-
-        // scope is a space-separated list of keywords
-        //  must have at least 'openid'
-        //const scope = ( options && options.requestPermissions ) || ['user:email'];
-        //const flatScope = scope.map( encodeURIComponent ).join( '+' );
 
         const url = client.authorizationUrl({
             scope: 'openid iz_profile offline_access',
@@ -81,34 +111,10 @@ izIAM.s = {
             code_challenge_method: 'S256',
             state: izIAM.s._stateEncode( loginOptions )
         });
-        //console.debug( 'authorizationUrl', url );
         loginOptions.url = url;
 
         izIAM.serviceConfiguration = loginOptions.config;
         izIAM.client = client;
-
-        /*
-        const credentialToken = Random.secret();
-        const scope = ( options && options.requestPermissions ) || ['user:email'];
-        const flatScope = scope.map( encodeURIComponent ).join( '+' );
-        const loginStyle = OAuth._loginStyle( izIAM.C.Service, config, options );
-
-        let allowSignup = '';
-        if( Accounts._options?.forbidClientAccountCreation ){
-            allowSignup = '&allow_signup=false'; // https://docs.github.com/en/developers/apps/building-oauth-apps/authorizing-oauth-apps#parameters
-        }
-
-        const loginUrl =
-            config.serverUrl + config.authorizationEndpoint +
-            `?client_id=${config.clientId}` +
-            `response_type=code` +
-            `&response_mode=query` +
-            `&scope=${flatScope}` +
-            `&redirect_uri=${config.redirectUrl}` +
-            `&state=${OAuth._stateParam(loginStyle, credentialToken, options && options.redirectUrl)}` +
-            allowSignup;
-        }
-        */
 
         return loginOptions;
     },
@@ -132,3 +138,4 @@ izIAM.s = {
         return Buffer.from( JSON.stringify( o )).toString( 'base64' );
     }
 };
+//

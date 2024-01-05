@@ -2,7 +2,7 @@
 
 ## What is it ?
 
-A Meteor package which manages the OIDC connection against izIAM Identity Manager.
+A Meteor package which manages the OIDC connection against izIAM© Identity and Access Manager.
 
 ## Configuration
 
@@ -44,9 +44,8 @@ Instead we check npm versions of installed packages at runtime, on server startu
 
 Dependencies as of v 1.0.0:
 ```
-    '@popperjs/core': '^2.11.6',
-    'bootstrap': '^5.2.1',
-    'lodash': '^4.17.0'
+    'lodash': '^4.17.0',
+    'openid-client': '^5.6.1'
 ```
 
 Each of these dependencies should be installed at application level:

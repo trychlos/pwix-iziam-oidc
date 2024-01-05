@@ -26,11 +26,9 @@ function configure( api ){
         'izIAM'
     ]);
     api.use( 'ecmascript', ['client', 'server'] );
-    api.use( 'fetch', 'server' );
-    api.use( 'http', 'server' );
     api.use( 'oauth', ['client', 'server'] );
     api.use( 'oauth2', ['client', 'server'] );
-    api.use( 'pwix:core-ui' );
+    api.use( 'pwix:core-app' );
     api.use( 'pwix:i18n@1.5.2' );
     api.use( 'random', 'client' );
     api.use( 'service-configuration', ['client', 'server'] );
