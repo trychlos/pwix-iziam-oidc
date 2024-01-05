@@ -98,14 +98,18 @@ izIAM.s = {
             redirect_uris: [ loginOptions.redirectUrl ],
             response_types: [ 'code' ]
         });
-        console.debug( 'client', client );
+        //console.debug( 'client', client );
 
         // store the code_verifier in the 'state' parameter which is brought back in the callback
         loginOptions.code_verifier = generators.codeVerifier();
         loginOptions.code_challenge = generators.codeChallenge( loginOptions.code_verifier );
 
+        let scopes = [];
+        scopes = scopes.concat( izIAM.C.Scopes );
+        scopes = scopes.concat( izIAM.settings.additionalScopes );
+
         const url = client.authorizationUrl({
-            scope: 'openid iz_profile offline_access',
+            scope: scopes.join( ' ' ),
             resource: izIAM.settings.resource,
             code_challenge: loginOptions.code_challenge,
             code_challenge_method: 'S256',

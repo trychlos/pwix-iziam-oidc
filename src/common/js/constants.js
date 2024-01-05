@@ -10,7 +10,13 @@ izIAM.C = {
         NONE: 0,
         CONFIGURE:  0x01 <<  0,
         DEBUG:      0x01 <<  1
-    }
+    },
+
+    // default scopes
+    Scopes: [
+        'openid',
+        'offline_access'
+    ]
 };
 
 // non exported variables
