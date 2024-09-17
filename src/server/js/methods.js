@@ -12,7 +12,7 @@
  */
 
 Meteor.methods({
-    'iziam.prepareLogin'( options ){
-        return izIAM.s.prepareLogin( options );
+    async 'iziam.prepareLogin'( options ){
+        return await izIAM.s.prepareLogin( options );
     }
 });

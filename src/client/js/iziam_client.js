@@ -11,8 +11,8 @@ import { ServiceConfiguration } from 'meteor/service-configuration';
 // @param credentialRequestCompleteCallback {Function} Callback function to call on
 //   completion. Takes one argument, credentialToken on success, or Error on
 //   error.
-// Note: the requestCredential() function is called by accounts-iziam, and is not expected to return something. So may be async.
-izIAM.requestCredential = ( options, credentialRequestCompleteCallback ) => {
+// Note: the requestCredential() function is called by accounts-iziam, and is not expected to return something.
+izIAM.requestCredential = async ( options, credentialRequestCompleteCallback ) => {
     console.debug( 'entering izIAM.requestCredential() with options', options );
 
     // support both (options, callback) and (callback).
@@ -24,7 +24,7 @@ izIAM.requestCredential = ( options, credentialRequestCompleteCallback ) => {
     // make sure options is a plain object
     options = options || {};
 
-    Meteor.callPromise( 'iziam.prepareLogin', options )
+    Meteor.callAsync( 'iziam.prepareLogin', options )
         .then(( loginOptions ) => {
             if( !loginOptions ){
                 credentialRequestCompleteCallback && credentialRequestCompleteCallback( new ServiceConfiguration.ConfigError());

@@ -2,7 +2,7 @@
 
 ## What is it ?
 
-A Meteor package which manages the OIDC connection against izIAM© Identity and Access Manager.
+A Meteor package which manages the OIDC connection against izIAM Identity and Access Manager.
 
 ## Configuration
 

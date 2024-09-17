@@ -21,18 +21,18 @@ Package.onTest( function( api ){
 });
 
 function configure( api ){
-    api.versionsFrom( '2.9.0' );
+    api.versionsFrom([ '2.9.0', '3.0-rc.1' ]);
     api.export([
         'izIAM'
     ]);
     api.use( 'ecmascript', ['client', 'server'] );
     api.use( 'oauth', ['client', 'server'] );
     api.use( 'oauth2', ['client', 'server'] );
-    api.use( 'pwix:core-app' );
+    api.use( 'pwix:env-settings@2.1.0-rc' );
     api.use( 'pwix:i18n@1.5.2' );
     api.use( 'random', 'client' );
     api.use( 'service-configuration', ['client', 'server'] );
-    api.use( 'tmeasday:check-npm-versions@1.0.2', 'server' );
+    api.use( 'tmeasday:check-npm-versions@2.0.0', 'server' );
     api.use( 'tracker' );
 }
 

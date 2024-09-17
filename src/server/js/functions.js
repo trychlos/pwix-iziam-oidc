@@ -5,6 +5,7 @@
 import _ from 'lodash';
 import { generators, Issuer } from 'openid-client';
 
+import { EnvSettings } from 'meteor/pwix:env-settings';
 import { Random } from 'meteor/random';
 import { ServiceConfiguration } from 'meteor/service-configuration';
 
@@ -26,55 +27,51 @@ izIAM.s = {
         return Object.keys( c ).join( ' ' );
     },
 
-    // try to discover the OpenID issuer
-    //  first run when envSettings are available
-    //  then retried each time a connection is requested
-    tryDiscover(){
-        if( !izIAM.Issuer ){
-            if( izIAM.settings.rootUrl ){
-                Issuer.discover( izIAM.settings.rootUrl )
-                    .then(( issuer ) => {
-                        console.debug( 'set izIAM.Issuer after successful '+izIAM.C.Service+' discovery' );
-                        izIAM.Issuer = issuer;
-                    })
-                    .catch(( e ) => {
-                        // may happen that the Issuer be temporarily unavailable - will have to retry later
-                        console.warn( e );
-                    });
-            } else {
-                console.warn( izIAM.C.Service, 'rootUrl is not set' );
-            }
-        }
-    },
-
     // return the config as read from settings and systematically set in ServiceConfiguration collection
     //  making sure to work with last version
-    getConfig(){
-        ServiceConfiguration.configurations.remove({ service: izIAM.C.Service });
-        const set = {
-            loginStyle: izIAM.settings.loginStyle || 'popup',
-            clientId: izIAM.settings.clientId,
-            secret: izIAM.settings.clientSecret,
-            serverUrl: izIAM.settings.rootUrl,
-            resource: izIAM.settings.resource,
-            authorizationEndpoint: izIAM.Issuer.authorization_endpoint.substring( izIAM.settings.rootUrl.length ),
-            tokenEndpoint: izIAM.Issuer.token_endpoint.substring( izIAM.settings.rootUrl.length ),
-            userinfoEndpoint: izIAM.Issuer.userinfo_endpoint.substring( izIAM.settings.rootUrl.length ),
-            idTokenWhitelistFields: [],
-            redirectUrl: izIAM.settings.redirectUrl
-        };
-        ServiceConfiguration.configurations.upsert({ service: izIAM.C.Service }, { $set: set });
-        config = ServiceConfiguration.configurations.findOne({ service: izIAM.C.Service });
-        console.debug( 'get ServiceConfiguration', config );
+    async getConfig(){
+        let config;
+        const debug = false;
+        await ServiceConfiguration.configurations.removeAsync({ service: izIAM.C.Service })
+            .then(( res ) => {
+                debug && console.debug( 'removeAsync', res );
+                const set = {
+                    loginStyle: izIAM.settings.loginStyle || 'popup',
+                    clientId: izIAM.settings.clientId,
+                    secret: izIAM.settings.clientSecret,
+                    serverUrl: izIAM.settings.issuerUrl,
+                    resource: izIAM.settings.resource,
+                    authorizationEndpoint: izIAM.Issuer.authorization_endpoint.substring( izIAM.settings.issuerUrl.length ),
+                    tokenEndpoint: izIAM.Issuer.token_endpoint.substring( izIAM.settings.issuerUrl.length ),
+                    userinfoEndpoint: izIAM.Issuer.userinfo_endpoint.substring( izIAM.settings.issuerUrl.length ),
+                    idTokenWhitelistFields: [],
+                    redirectUrl: izIAM.settings.redirectUrl
+                };
+                return ServiceConfiguration.configurations.upsertAsync({ service: izIAM.C.Service }, { $set: set });
+            })
+            .then(( res ) => {
+                debug && console.debug( 'upsertAsync', res );
+                return ServiceConfiguration.configurations.findOneAsync({ service: izIAM.C.Service });
+            })
+            .then(( res ) => {
+                config = res;
+                debug && console.debug( 'findOneAsync', config );
+            });
         return config;
     },
 
     // Prepare the needed options
     //  taking advantage of being server side to have openid-client resources
     //  this is called as a method from the client requestCredential() function
-    prepareLogin( options ){
+    async prepareLogin( options ){
+
+        const debugSettings = false;
+        const debugIssuer = false;
+        const debugConfig = false;
 
         // make sure we have read the settings from the server and got an Issuer
+        await izIAM.s.tryDiscover();
+
         if( !izIAM.settings ){
             throw new Error( 'izIAM settings are not available' );
         }
@@ -83,7 +80,11 @@ izIAM.s = {
         }
 
         const loginOptions = {};
-        loginOptions.config = izIAM.s.getConfig();
+        loginOptions.config = await izIAM.s.getConfig();
+
+        debugSettings && console.debug( 'settings', izIAM.settings );
+        debugIssuer && console.debug( 'Issuer', izIAM.Issuer );
+        debugConfig && console.debug( 'config', loginOptions.config );
 
         // needed here (server side) in order to be embedded in the 'state' parm in order to be able to close the modal later
         loginOptions.redirectUrl = options.redirectUrl || loginOptions.config.redirectUrl;
@@ -140,6 +141,39 @@ izIAM.s = {
             credentialToken: options.credentialToken
         }
         return Buffer.from( JSON.stringify( o )).toString( 'base64' );
+    },
+
+    // try to discover the OpenID issuer
+    //  first run when envSettings are available
+    //  then retried each time a connection is requested
+    async tryDiscover(){
+        if( !izIAM.settings ){
+            const settings = EnvSettings.environmentServerSettings();
+            if( settings && settings.private && settings.private[izIAM.C.Service]  ){
+                console.debug( 'set izIAM service settings from private server settings per environment' );
+                izIAM.settings = settings.private[izIAM.C.Service];
+            }
+        }
+        //console.debug( 'izIAM.settings', izIAM.settings );
+        let promises = [];
+        if( izIAM.settings ){
+            if( !izIAM.Issuer ){
+                if( izIAM.settings.issuerUrl ){
+                    promises.push( Issuer.discover( izIAM.settings.issuerUrl )
+                        .then(( issuer ) => {
+                            console.debug( 'set izIAM.Issuer after successful '+izIAM.C.Service+' discovery' );
+                            izIAM.Issuer = issuer;
+                        })
+                        .catch(( e ) => {
+                            // may happen that the Issuer be temporarily unavailable - will have to retry later
+                            console.warn( e );
+                        }));
+                } else {
+                    console.warn( izIAM.C.Service, 'issuerUrl is not set' );
+                }
+            }
+        }
+        await Promise.allSettled( promises );
     }
 };
 //
