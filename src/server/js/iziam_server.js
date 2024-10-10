@@ -26,7 +26,7 @@ OAuth.registerService( izIAM.C.Service, 2, null, function( query ){
     return izIAM.client.callback( options.redirect, query, {
         state: query.state,
         code_verifier: options.verifier,
-        //response_type: 'code'
+        response_type: 'code'
     })
     .then(( tks ) => {
         tokenSet = tks;
@@ -77,7 +77,6 @@ OAuth.registerService( izIAM.C.Service, 2, null, function( query ){
 });
 
 izIAM.retrieveCredential = function( credentialToken, credentialSecret ){
-    console.debug( '** in izIAM.retrieveCredential()' );
+    console.debug( 'izIAM.retrieveCredential()' );
     return OAuth.retrieveCredential( credentialToken, credentialSecret );
 };
-//

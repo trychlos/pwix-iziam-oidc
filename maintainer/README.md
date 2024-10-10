@@ -4,7 +4,7 @@
 
 ### Application
 
-- must be declared as a Relying Party (RP) client in the OIDC Provider
+- must be declared as a Relying Party (RP) client in the OIDC Provider (a 'client' in izIAM words)
 
     It is so issued with a client identifier and secret
 
@@ -12,13 +12,14 @@
 
     which itself will use (and imply) `pwix:iziam-oidc` package
 
-- must include and stylish `iziamLoginButton` component.
+- should include and stylish `iziamLoginButton` component.
 
 ### At initialization time
 
 ```
  package                client                                                      server
  ---------------------  ----------------------------------------------------------  ----------------------------------------------------------
+ iziam-oidc             export izIAM global                                         export izIAM global
  accounts-iziam         call Accounts.oauth.registerService( izIAM.C.Service );     call Accounts.oauth.registerService( izIAM.C.Service );
  accounts-iziam         define Meteor.loginWithIzIAM() function                     call Accounts.addAutopublishFields({...});
  iziam-oidc                                                                         call OAuth.registerService( izIAM.C.Service )

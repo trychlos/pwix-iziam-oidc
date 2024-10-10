@@ -4,6 +4,12 @@
 
 A Meteor package which manages the OIDC connection against izIAM Identity and Access Manager.
 
+## Provides
+
+### `izIAM`
+
+A global object which holds all the needed resources.
+
 ## Configuration
 
 The package's behavior can be configured through a call to the `izIAM.configure()` method, with just a single javascript object argument, which itself should only contains the options you want override.
@@ -27,14 +33,6 @@ Known configuration options are:
 Please note that `izIAM.configure()` method should be called in the same terms both in client and server sides.
 
 Remind too that Meteor packages are instanciated at application level. They are so only configurable once, or, in other words, only one instance has to be or can be configured. Addtionnal calls to `izIAM.configure()` will just override the previous one. You have been warned: **only the application should configure a package**.
-
-## Functions
-
-### `izIAM.discover( [url] )`
-
-Discover the issuer available as the specified URL, defaulting to izIAM._defaults.oid_dicovery = `http://localhost:3000`.
-
-Server-side function.
 
 ## NPM peer dependencies
 

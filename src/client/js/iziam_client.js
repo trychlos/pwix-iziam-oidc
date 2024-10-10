@@ -13,7 +13,7 @@ import { ServiceConfiguration } from 'meteor/service-configuration';
 //   error.
 // Note: the requestCredential() function is called by accounts-iziam, and is not expected to return something.
 izIAM.requestCredential = async ( options, credentialRequestCompleteCallback ) => {
-    console.debug( 'entering izIAM.requestCredential() with options', options );
+    //console.debug( 'entering izIAM.requestCredential() with options', options );
 
     // support both (options, callback) and (callback).
     if( !credentialRequestCompleteCallback && typeof options === 'function' ){

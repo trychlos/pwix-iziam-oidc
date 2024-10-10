@@ -16,13 +16,11 @@ izIAM.s = {
     checkScopes( a ){
         const b = _.isArray( a ) ? a : [ a ];   // be sure to have an array of strings
         let c = {};
-        ( b || [] ).every(( d ) => {            // explore array
-            const e = d.split( /\s+/ );         // be sure to have an array of single words
-            ( e || [] ).every(( f ) => {        // and for each word...
+        ( b || [] ).forEach(( d ) => {            // explore array
+            const e = d.split( /\s+/ );           // be sure to have an array of single words
+            ( e || [] ).forEach(( f ) => {        // and for each word...
                 c[f] = true;
-                return true;
             });
-            return true;
         });
         return Object.keys( c ).join( ' ' );
     },
@@ -37,15 +35,15 @@ izIAM.s = {
                 debug && console.debug( 'removeAsync', res );
                 const set = {
                     loginStyle: izIAM.settings.loginStyle || 'popup',
-                    clientId: izIAM.settings.clientId,
-                    secret: izIAM.settings.clientSecret,
+                    clientId: izIAM.settings.client_id,
+                    clientSecret: izIAM.settings.client_secret,
                     serverUrl: izIAM.settings.issuerUrl,
                     resource: izIAM.settings.resource,
                     authorizationEndpoint: izIAM.Issuer.authorization_endpoint.substring( izIAM.settings.issuerUrl.length ),
                     tokenEndpoint: izIAM.Issuer.token_endpoint.substring( izIAM.settings.issuerUrl.length ),
                     userinfoEndpoint: izIAM.Issuer.userinfo_endpoint.substring( izIAM.settings.issuerUrl.length ),
                     idTokenWhitelistFields: [],
-                    redirectUrl: izIAM.settings.redirectUrl
+                    redirect_uri: izIAM.settings.redirect_uri
                 };
                 return ServiceConfiguration.configurations.upsertAsync({ service: izIAM.C.Service }, { $set: set });
             })
@@ -63,14 +61,16 @@ izIAM.s = {
     // Prepare the needed options
     //  taking advantage of being server side to have openid-client resources
     //  this is called as a method from the client requestCredential() function
+    //
+    // @param {Object} options: an optional options object passed from 'iziamLoginButton' component through its 'iziamOptions' component parameter
     async prepareLogin( options ){
 
         const debugSettings = false;
         const debugIssuer = false;
-        const debugConfig = false;
 
         // make sure we have read the settings from the server and got an Issuer
         await izIAM.s.tryDiscover();
+        const serviceConfiguration = await izIAM.s.getConfig();
 
         if( !izIAM.settings ){
             throw new Error( 'izIAM settings are not available' );
@@ -79,25 +79,30 @@ izIAM.s = {
             throw new Error( 'Issuer has not been discovered' );
         }
 
-        const loginOptions = {};
-        loginOptions.config = await izIAM.s.getConfig();
-
+        // izIAM.settings are the settings read from the application 'private/config/server/environments.json'
         debugSettings && console.debug( 'settings', izIAM.settings );
+
+        // izIAM.Issuer is the metadata automatically discovered from the Issuer
         debugIssuer && console.debug( 'Issuer', izIAM.Issuer );
-        debugConfig && console.debug( 'config', loginOptions.config );
+
+        // build login options
+        const loginOptions = {};
+        loginOptions.config = serviceConfiguration;
 
         // needed here (server side) in order to be embedded in the 'state' parm in order to be able to close the modal later
-        loginOptions.redirectUrl = options.redirectUrl || loginOptions.config.redirectUrl;
-        loginOptions.loginStyle = options.loginStyle || loginOptions.config.loginStyle;
+        loginOptions.redirectUrl = options.redirect_uri || izIAM.settings.redirect_uri;
+        loginOptions.loginStyle = options.loginStyle || izIAM.settings.loginStyle;
+        loginOptions.popupOptions = options.popupOptions || izIAM.settings.popupOptions;
 
         // Meteor.OAuth requires a credentialToken in the 'state'
         loginOptions.credentialToken = Random.secret();
 
         const client = new izIAM.Issuer.Client({
-            client_id: loginOptions.config.clientId,
-            client_secret: loginOptions.config.secret,
+            client_id: options.client_id || izIAM.settings.client_id,
+            //client_secret: options.client_secret || izIAM.settings.client_secret,
             redirect_uris: [ loginOptions.redirectUrl ],
-            response_types: [ 'code' ]
+            response_types: [ 'code' ],
+            token_endpoint_auth_method: options.token_endpoint_auth_method || izIAM.settings.token_endpoint_auth_method || 'client_secret_basic'
         });
         //console.debug( 'client', client );
 
@@ -105,20 +110,22 @@ izIAM.s = {
         loginOptions.code_verifier = generators.codeVerifier();
         loginOptions.code_challenge = generators.codeChallenge( loginOptions.code_verifier );
 
-        let scopes = [];
-        scopes = scopes.concat( izIAM.C.Scopes );
-        scopes = scopes.concat( izIAM.settings.additionalScopes );
+        let scopes = ( options.scopes && options.scopes.length ) ? options.scopes : (( izIAM.settings.scopes && izIAM.settings.scopes.length ) ? izIAM.settings.scopes : [] );
+        if( !scopes.includes( 'openid' )){
+            scopes.push( 'openid' );
+        }
 
         const url = client.authorizationUrl({
             scope: scopes.join( ' ' ),
-            resource: izIAM.settings.resource,
+            resource: izIAM.settings.resources,
             code_challenge: loginOptions.code_challenge,
             code_challenge_method: 'S256',
             state: izIAM.s._stateEncode( loginOptions )
         });
+        //console.debug( 'url', url );
         loginOptions.url = url;
 
-        izIAM.serviceConfiguration = loginOptions.config;
+        izIAM.serviceConfiguration = serviceConfiguration;
         izIAM.client = client;
 
         return loginOptions;
