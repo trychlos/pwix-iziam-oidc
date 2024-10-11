@@ -18,7 +18,6 @@ OAuth.registerService( izIAM.C.Service, 2, null, function( query ){
     //console.debug( 'query', query );
 
     // get the authorization code in query.code
-    //const params = izIAM.client.callbackParams( query );
     const options = izIAM.s._stateDecode( query.state );
     console.debug( 'query', query, 'options', options );
     //delete query.state;

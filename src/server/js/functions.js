@@ -97,14 +97,23 @@ izIAM.s = {
         // Meteor.OAuth requires a credentialToken in the 'state'
         loginOptions.credentialToken = Random.secret();
 
-        const client = new izIAM.Issuer.Client({
+        // prepare the client-side OID client
+        const auth_method = options.token_endpoint_auth_method || izIAM.settings.token_endpoint_auth_method || 'client_secret_basic';
+        const clientParms = {
             client_id: options.client_id || izIAM.settings.client_id,
-            //client_secret: options.client_secret || izIAM.settings.client_secret,
             redirect_uris: [ loginOptions.redirectUrl ],
             response_types: [ 'code' ],
-            token_endpoint_auth_method: options.token_endpoint_auth_method || izIAM.settings.token_endpoint_auth_method || 'client_secret_basic'
-        });
-        //console.debug( 'client', client );
+            token_endpoint_auth_method: auth_method
+        };
+        if( auth_method !== 'none' ){
+            const secret = options.client_secret || izIAM.settings.client_secret;
+            if( !secret ){
+                throw new Error( 'client secret is not set through required by authentication method not being none' );
+            } else {
+                clientParms.client_secret = secret;
+            }
+        }
+        const client = new izIAM.Issuer.Client( clientParms );
 
         // store the code_verifier in the 'state' parameter which is brought back in the callback
         loginOptions.code_verifier = generators.codeVerifier();
