@@ -10,6 +10,8 @@ import { Random } from 'meteor/random';
 import { ServiceConfiguration } from 'meteor/service-configuration';
 
 izIAM.s = {
+    client: null,
+
     // make sure that provided scopes are single-spaces separated and appear only once
     //  @param {String|Array<String>} a list of scopes
     //  @param {String} a string of each scope appears only once
@@ -56,6 +58,15 @@ izIAM.s = {
                 debug && console.debug( 'findOneAsync', config );
             });
         return config;
+    },
+
+    // logout and terminate the user session
+    //  arguments are builkt on the server, but logout url is actually fetched from the client to be able to provide session cookies
+    async logout_args(){
+        const endSessionUrl = izIAM.s.client.endSessionUrl({
+            id_token_hint: izIAM.s.tokenSet.id_token,  // Retrieve the ID Token from the session
+        });
+        return { url: endSessionUrl };
     },
 
     // Prepare the needed options
@@ -135,7 +146,7 @@ izIAM.s = {
         loginOptions.url = url;
 
         izIAM.serviceConfiguration = serviceConfiguration;
-        izIAM.client = client;
+        izIAM.s.client = client;
 
         return loginOptions;
     },

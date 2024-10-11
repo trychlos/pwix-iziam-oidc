@@ -14,5 +14,8 @@
 Meteor.methods({
     async 'iziam.prepareLogin'( options ){
         return await izIAM.s.prepareLogin( options );
+    },
+    async 'iziam.logout_args'(){
+        return await izIAM.s.logout_args();
     }
 });

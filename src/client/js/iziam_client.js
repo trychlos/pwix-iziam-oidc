@@ -4,6 +4,7 @@
 
 import { OAuth } from 'meteor/oauth';
 import { ServiceConfiguration } from 'meteor/service-configuration';
+import { Tracker } from 'meteor/tracker';
 
 // Request izIAM credentials for the user
 // @param options {optional}
@@ -41,3 +42,22 @@ izIAM.requestCredential = async ( options, credentialRequestCompleteCallback ) =
             });
         });
 };
+
+// detect the user logout and end the OIDC session
+// have to fetch the end_session url from the client to have the session cookies
+let prev = Meteor.userId();
+Tracker.autorun(() => {
+    if( prev && !Meteor.userId()){
+        Meteor.callAsync( 'iziam.logout_args' ).then(( res ) => {
+            fetch( res.url, {
+                method: 'GET',
+                cache: 'no-cache',
+                mode: 'no-cors',
+                credentials: 'include'
+            }).then(() => {
+                window.location.pathname = '/';
+            });
+        })
+    }
+    prev = Meteor.userId();
+});

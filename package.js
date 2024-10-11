@@ -26,6 +26,7 @@ function configure( api ){
         'izIAM'
     ]);
     api.use( 'ecmascript' );
+    api.use( 'fetch' );
     api.use( 'oauth' );
     api.use( 'oauth2' );
     api.use( 'pwix:env-settings@2.1.0-rc' );

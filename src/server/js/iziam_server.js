@@ -21,21 +21,20 @@ OAuth.registerService( izIAM.C.Service, 2, null, function( query ){
     const options = izIAM.s._stateDecode( query.state );
     console.debug( 'query', query, 'options', options );
     //delete query.state;
-    let tokenSet;
-    return izIAM.client.callback( options.redirect, query, {
+    return izIAM.s.client.callback( options.redirect, query, {
         state: query.state,
         code_verifier: options.verifier,
         response_type: 'code'
     })
     .then(( tks ) => {
-        tokenSet = tks;
+        izIAM.s.tokenSet = tks;
         // get an access code with 'openid' scope as an object:
         //  access_token:
         //  expires_at:
         //  id_token:
         //  scope: 'email profile'  aka requested scopes, without (eaten) 'openid'
         //  token_type: 'Bearer'
-        console.log( 'received and validated tokens %j', tokenSet );
+        console.log( 'received and validated tokens %j', izIAM.s.tokenSet );
         // claims is an object
         //  sub: 'iziam'
         //  at_hash: ?
@@ -43,25 +42,25 @@ OAuth.registerService( izIAM.C.Service, 2, null, function( query ){
         //  exp: <timestamp>
         //  iat: ?
         //  iss: <OP Issuer>
-        console.log( 'validated ID Token claims %j', tokenSet.claims());
-        return izIAM.client.introspect( tokenSet.access_token );
+        console.log( 'validated ID Token claims %j', izIAM.s.tokenSet.claims());
+        return izIAM.s.client.introspect( izIAM.s.tokenSet.access_token );
     })
     .then(( response ) => {
         console.debug( 'access_token introspection:', response );
-        return izIAM.client.introspect( tokenSet.id_token );
+        return izIAM.s.client.introspect( izIAM.s.tokenSet.id_token );
     })
     .then(( response ) => {
         console.debug( 'id_token introspection:', response );   // { active: false }
-        return izIAM.client.userinfo( tokenSet.access_token )
+        return izIAM.s.client.userinfo( izIAM.s.tokenSet.access_token )
     })
     .then(( userinfo ) => {
         console.log( 'userinfo %j', userinfo );
 
         let serviceData = userinfo;
         serviceData.id = userinfo.sub;
-        serviceData.accessToken = tokenSet.access_token;
-        serviceData.refreshToken = tokenSet.refresh_token;
-        serviceData.expiresAt = tokenSet.expires_at;
+        serviceData.accessToken = izIAM.s.tokenSet.access_token;
+        serviceData.refreshToken = izIAM.s.tokenSet.refresh_token;
+        serviceData.expiresAt = izIAM.s.tokenSet.expires_at;
 
         const o = {
             serviceData: serviceData,
