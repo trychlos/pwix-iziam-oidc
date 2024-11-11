@@ -35,6 +35,8 @@ izIAM.s = {
         await ServiceConfiguration.configurations.removeAsync({ service: izIAM.C.Service })
             .then(( res ) => {
                 debug && console.debug( 'removeAsync', res );
+                //console.debug( 'izIAM.Issuer', izIAM.Issuer );
+                //console.debug( 'izIAM.settings', izIAM.settings );
                 const set = {
                     loginStyle: izIAM.settings.loginStyle || 'popup',
                     clientId: izIAM.settings.client_id,
@@ -61,12 +63,12 @@ izIAM.s = {
     },
 
     // logout and terminate the user session
-    //  arguments are builkt on the server, but logout url is actually fetched from the client to be able to provide session cookies
+    //  arguments are built on the server, but logout url is actually fetched from the client to be able to provide session cookies
     async logout_args(){
-        const endSessionUrl = izIAM.s.client.endSessionUrl({
+        const endSessionUrl = izIAM.s.client ? izIAM.s.client.endSessionUrl({
             id_token_hint: izIAM.s.tokenSet.id_token,  // Retrieve the ID Token from the session
-        });
-        return { url: endSessionUrl };
+        }) : null;
+        return endSessionUrl ? { url: endSessionUrl } : null;
     },
 
     // Prepare the needed options
@@ -119,7 +121,7 @@ izIAM.s = {
         if( auth_method !== 'none' ){
             const secret = options.client_secret || izIAM.settings.client_secret;
             if( !secret ){
-                throw new Error( 'client secret is not set through required by authentication method not being none' );
+                throw new Error( 'client secret is not set though required by authentication method not being none' );
             } else {
                 clientParms.client_secret = secret;
             }

@@ -49,14 +49,16 @@ let prev = Meteor.userId();
 Tracker.autorun(() => {
     if( prev && !Meteor.userId()){
         Meteor.callAsync( 'iziam.logout_args' ).then(( res ) => {
-            fetch( res.url, {
-                method: 'GET',
-                cache: 'no-cache',
-                mode: 'no-cors',
-                credentials: 'include'
-            }).then(() => {
-                window.location.pathname = '/';
-            });
+            if( res && res.url ){
+                fetch( res.url, {
+                    method: 'GET',
+                    cache: 'no-cache',
+                    mode: 'no-cors',
+                    credentials: 'include'
+                }).then(() => {
+                    window.location.pathname = '/';
+                });
+            }
         })
     }
     prev = Meteor.userId();

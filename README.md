@@ -60,7 +60,7 @@ New and updated translations are willingly accepted, and more than welcome. Just
 `pwix:iziam-oidc` may use `localStorage` to record ...
 `pwix:iziam-oidc` may use `localStorage` to record ...
 
-Because this is dynamically done on a per dialog basis, and only on the caller request, the package doesn't advertize of this use, relying on the caller own declaration.
+Because this is dynamically done on a per dialog basis, and only on the caller request, the package doesn't advertise of this use, relying on the caller own declaration.
 
 ---
 P. Wieser

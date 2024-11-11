@@ -36,11 +36,11 @@ OAuth.registerService( izIAM.C.Service, 2, null, function( query ){
         //  token_type: 'Bearer'
         console.log( 'received and validated tokens %j', izIAM.s.tokenSet );
         // claims is an object
-        //  sub: 'iziam'
+        //  sub: <login>
         //  at_hash: ?
         //  aud: <client_id>
         //  exp: <timestamp>
-        //  iat: ?
+        //  iat: <timestamp>
         //  iss: <OP Issuer>
         console.log( 'validated ID Token claims %j', izIAM.s.tokenSet.claims());
         return izIAM.s.client.introspect( izIAM.s.tokenSet.access_token );
