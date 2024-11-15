@@ -77,6 +77,7 @@ izIAM.s = {
     //
     // @param {Object} options: an optional options object passed from 'iziamLoginButton' component through its 'iziamOptions' component parameter
     async prepareLogin( options ){
+        //console.debug( 'prepareLogin', options );
 
         const debugSettings = false;
         const debugIssuer = false;
@@ -127,6 +128,7 @@ izIAM.s = {
             }
         }
         const client = new izIAM.Issuer.Client( clientParms );
+        //console.debug( 'client', client );
 
         // store the code_verifier in the 'state' parameter which is brought back in the callback
         loginOptions.code_verifier = generators.codeVerifier();
