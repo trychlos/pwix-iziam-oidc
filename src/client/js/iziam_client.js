@@ -50,14 +50,7 @@ Tracker.autorun(() => {
     if( prev && !Meteor.userId()){
         Meteor.callAsync( 'iziam.logout_args' ).then(( res ) => {
             if( res && res.url ){
-                fetch( res.url, {
-                    method: 'GET',
-                    cache: 'no-cache',
-                    mode: 'no-cors',
-                    credentials: 'include'
-                }).then(() => {
-                    window.location.pathname = '/';
-                });
+                window.location.href = res.url;
             }
         })
     }

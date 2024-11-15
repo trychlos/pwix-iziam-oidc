@@ -47,7 +47,8 @@ izIAM.s = {
                     tokenEndpoint: izIAM.Issuer.token_endpoint.substring( izIAM.settings.issuerUrl.length ),
                     userinfoEndpoint: izIAM.Issuer.userinfo_endpoint.substring( izIAM.settings.issuerUrl.length ),
                     idTokenWhitelistFields: [],
-                    redirect_uri: izIAM.settings.redirect_uri
+                    redirect_uri: izIAM.settings.redirect_uri,
+                    post_logout_redirect_uri: izIAM.settings.post_logout_redirect_uri
                 };
                 return ServiceConfiguration.configurations.upsertAsync({ service: izIAM.C.Service }, { $set: set });
             })
@@ -65,9 +66,14 @@ izIAM.s = {
     // logout and terminate the user session
     //  arguments are built on the server, but logout url is actually fetched from the client to be able to provide session cookies
     async logout_args(){
-        const endSessionUrl = izIAM.s.client ? izIAM.s.client.endSessionUrl({
-            id_token_hint: izIAM.s.tokenSet.id_token,  // Retrieve the ID Token from the session
-        }) : null;
+        let args = {};
+        if( izIAM.s.tokenSet ){
+            args.id_token_hint = izIAM.s.tokenSet.id_token;  // Retrieve the ID Token from the session
+        }
+        if( izIAM.settings?.post_logout_redirect_uri ){
+            args.post_logout_redirect_uri = izIAM.settings.post_logout_redirect_uri;
+        }
+        const endSessionUrl = izIAM.s.client ? izIAM.s.client.endSessionUrl( args ) : null;
         return endSessionUrl ? { url: endSessionUrl } : null;
     },
 
