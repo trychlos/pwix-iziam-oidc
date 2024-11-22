@@ -41,8 +41,8 @@
  --------------------------------   ----------------------------------------------------------  ----------------------------------------------------------
  accounts-iziam:click'              call to Meteor.loginWithIzIAM()
  accounts-iziam:loginWithIzIAM()    call izIAM.requestCredential()
- iziam-oidc:requestCredential()     call 'prepareLogin' method
- iziam-oidc:prepareLogin                                                                        build and return loginOptions for OIDC Provider (OP)
+ iziam-oidc:requestCredential()     call 'loginOptions' method
+ iziam-oidc:loginOptions                                                                        build and return loginOptions for OIDC Provider (OP)
  iziam-oidc:requestCredential()     call OAuth.launchLogin( loginOptions )
 ```
 

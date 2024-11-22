@@ -10,155 +10,100 @@ import { Random } from 'meteor/random';
 import { ServiceConfiguration } from 'meteor/service-configuration';
 
 izIAM.s = {
-    client: null,
 
-    // make sure that provided scopes are single-spaces separated and appear only once
-    //  @param {String|Array<String>} a list of scopes
-    //  @param {String} a string of each scope appears only once
-    checkScopes( a ){
-        const b = _.isArray( a ) ? a : [ a ];   // be sure to have an array of strings
-        let c = {};
-        ( b || [] ).forEach(( d ) => {            // explore array
-            const e = d.split( /\s+/ );           // be sure to have an array of single words
-            ( e || [] ).forEach(( f ) => {        // and for each word...
-                c[f] = true;
-            });
-        });
-        return Object.keys( c ).join( ' ' );
-    },
-
-    // return the config as read from settings and systematically set in ServiceConfiguration collection
-    //  making sure to work with last version
-    async getConfig(){
-        let config;
-        const debug = false;
-        await ServiceConfiguration.configurations.removeAsync({ service: izIAM.C.Service })
-            .then(( res ) => {
-                debug && console.debug( 'removeAsync', res );
-                //console.debug( 'izIAM.Issuer', izIAM.Issuer );
-                //console.debug( 'izIAM.settings', izIAM.settings );
-                const set = {
-                    loginStyle: izIAM.settings.loginStyle || 'popup',
-                    clientId: izIAM.settings.client_id,
-                    clientSecret: izIAM.settings.client_secret,
-                    serverUrl: izIAM.settings.issuerUrl,
-                    resource: izIAM.settings.resource,
-                    authorizationEndpoint: izIAM.Issuer.authorization_endpoint.substring( izIAM.settings.issuerUrl.length ),
-                    tokenEndpoint: izIAM.Issuer.token_endpoint.substring( izIAM.settings.issuerUrl.length ),
-                    userinfoEndpoint: izIAM.Issuer.userinfo_endpoint.substring( izIAM.settings.issuerUrl.length ),
-                    idTokenWhitelistFields: [],
-                    redirect_uri: izIAM.settings.redirect_uri,
-                    post_logout_redirect_uri: izIAM.settings.post_logout_redirect_uri
+    // set the izIAM.s.client global server variable
+    //  requires izIAM.s.settings
+    //  idempotent
+    async _getClient( opts={} ){
+        if( !izIAM.s.client ){
+            this._getIssuer();
+            if( izIAM.s.issuer ){
+                const auth_method = opts.token_endpoint_auth_method || izIAM.s.settings.token_endpoint_auth_method || 'client_secret_basic';
+                const parms = {
+                    client_id: opts.client_id || izIAM.s.settings.client_id,
+                    redirect_uris: [ opts.redirect_uri || izIAM.s.settings.redirect_uri ],
+                    response_types: [ 'code' ],
+                    token_endpoint_auth_method: auth_method
                 };
-                return ServiceConfiguration.configurations.upsertAsync({ service: izIAM.C.Service }, { $set: set });
-            })
-            .then(( res ) => {
-                debug && console.debug( 'upsertAsync', res );
-                return ServiceConfiguration.configurations.findOneAsync({ service: izIAM.C.Service });
-            })
-            .then(( res ) => {
-                config = res;
-                debug && console.debug( 'findOneAsync', config );
-            });
-        return config;
-    },
-
-    // logout and terminate the user session
-    //  arguments are built on the server, but logout url is actually fetched from the client to be able to provide session cookies
-    async logout_args(){
-        let args = {};
-        if( izIAM.s.tokenSet ){
-            args.id_token_hint = izIAM.s.tokenSet.id_token;  // Retrieve the ID Token from the session
-        }
-        if( izIAM.settings?.post_logout_redirect_uri ){
-            args.post_logout_redirect_uri = izIAM.settings.post_logout_redirect_uri;
-        }
-        const endSessionUrl = izIAM.s.client ? izIAM.s.client.endSessionUrl( args ) : null;
-        return endSessionUrl ? { url: endSessionUrl } : null;
-    },
-
-    // Prepare the needed options
-    //  taking advantage of being server side to have openid-client resources
-    //  this is called as a method from the client requestCredential() function
-    //
-    // @param {Object} options: an optional options object passed from 'iziamLoginButton' component through its 'iziamOptions' component parameter
-    async prepareLogin( options ){
-        //console.debug( 'prepareLogin', options );
-
-        const debugSettings = false;
-        const debugIssuer = false;
-
-        // make sure we have read the settings from the server and got an Issuer
-        await izIAM.s.tryDiscover();
-        const serviceConfiguration = await izIAM.s.getConfig();
-
-        if( !izIAM.settings ){
-            throw new Error( 'izIAM settings are not available' );
-        }
-        if( !izIAM.Issuer ){
-            throw new Error( 'Issuer has not been discovered' );
-        }
-
-        // izIAM.settings are the settings read from the application 'private/config/server/environments.json'
-        debugSettings && console.debug( 'settings', izIAM.settings );
-
-        // izIAM.Issuer is the metadata automatically discovered from the Issuer
-        debugIssuer && console.debug( 'Issuer', izIAM.Issuer );
-
-        // build login options
-        const loginOptions = {};
-        loginOptions.config = serviceConfiguration;
-
-        // needed here (server side) in order to be embedded in the 'state' parm in order to be able to close the modal later
-        loginOptions.redirectUrl = options.redirect_uri || izIAM.settings.redirect_uri;
-        loginOptions.loginStyle = options.loginStyle || izIAM.settings.loginStyle;
-        loginOptions.popupOptions = options.popupOptions || izIAM.settings.popupOptions;
-
-        // Meteor.OAuth requires a credentialToken in the 'state'
-        loginOptions.credentialToken = Random.secret();
-
-        // prepare the client-side OID client
-        const auth_method = options.token_endpoint_auth_method || izIAM.settings.token_endpoint_auth_method || 'client_secret_basic';
-        const clientParms = {
-            client_id: options.client_id || izIAM.settings.client_id,
-            redirect_uris: [ loginOptions.redirectUrl ],
-            response_types: [ 'code' ],
-            token_endpoint_auth_method: auth_method
-        };
-        if( auth_method !== 'none' ){
-            const secret = options.client_secret || izIAM.settings.client_secret;
-            if( !secret ){
-                throw new Error( 'client secret is not set though required by authentication method not being none' );
-            } else {
-                clientParms.client_secret = secret;
+                if( auth_method !== 'none' ){
+                    const secret = opts.client_secret || izIAM.s.settings.client_secret;
+                    if( !secret ){
+                        throw new Error( 'client secret is not set though required by authentication method not being none' );
+                    } else {
+                        parms.client_secret = secret;
+                    }
+                }
+                izIAM.s.client = new izIAM.s.issuer.Client( parms );
             }
         }
-        const client = new izIAM.Issuer.Client( clientParms );
-        //console.debug( 'client', client );
+    },
 
-        // store the code_verifier in the 'state' parameter which is brought back in the callback
-        loginOptions.code_verifier = generators.codeVerifier();
-        loginOptions.code_challenge = generators.codeChallenge( loginOptions.code_verifier );
-
-        let scopes = ( options.scopes && options.scopes.length ) ? options.scopes : (( izIAM.settings.scopes && izIAM.settings.scopes.length ) ? izIAM.settings.scopes : [] );
-        if( !scopes.includes( 'openid' )){
-            scopes.push( 'openid' );
+    // set the izIAM.s.issuer global server variable
+    //  requires izIAM.s.settings
+    //  idempotent
+    async _getIssuer(){
+        if( !izIAM.s.issuer ){
+            this._getSettings();
+            if( izIAM.s.settings ){
+                if( izIAM.s.settings.issuerUrl ){
+                    try {
+                        izIAM.s.issuer = await Issuer.discover( izIAM.s.settings.issuerUrl );
+                        if( izIAM.s.issuer ){
+                            console.debug( 'set izIAM.s.issuer after successful '+izIAM.C.Service+' discovery' );
+                        }
+                    }
+                    catch( e ){
+                        // may happen that the Issuer be temporarily unavailable - will have to retry later
+                        console.warn( e );
+                    };
+                } else {
+                    console.warn( 'unable to find \'issuerUrl\' data in \''+izIAM.C.Service+'\' section from read private settings' );
+                }
+            }
         }
+    },
 
-        const url = client.authorizationUrl({
-            scope: scopes.join( ' ' ),
-            resource: izIAM.settings.resources,
-            code_challenge: loginOptions.code_challenge,
-            code_challenge_method: 'S256',
-            state: izIAM.s._stateEncode( loginOptions )
-        });
-        //console.debug( 'url', url );
-        loginOptions.url = url;
+    // setup the izIAM.serviceConfiguration global server variable
+    //  + make sure the ServiceConfiguraton Meteor collection ('meteor_accounts_loginServiceConfiguration') is up to date
+    //  requires izIAM.s.settings
+    async _getServiceConfiguration(){
+        this._getIssuer();
+        if( izIAM.s.issuer ){
+            // remove the previous version
+            await ServiceConfiguration.configurations.removeAsync({ service: izIAM.C.Service });
+            // make sure service configuration has last version from settings
+            await ServiceConfiguration.configurations.upsertAsync({ service: izIAM.C.Service }, { $set: {
+                loginStyle: izIAM.s.settings.loginStyle || 'popup',
+                clientId: izIAM.s.settings.client_id,
+                clientSecret: izIAM.s.settings.client_secret,
+                serverUrl: izIAM.s.settings.issuerUrl,
+                resource: izIAM.s.settings.resource,
+                authorizationEndpoint: izIAM.s.issuer.authorization_endpoint.substring( izIAM.s.settings.issuerUrl.length ),
+                tokenEndpoint: izIAM.s.issuer.token_endpoint.substring( izIAM.s.settings.issuerUrl.length ),
+                userinfoEndpoint: izIAM.s.issuer.userinfo_endpoint.substring( izIAM.s.settings.issuerUrl.length ),
+                idTokenWhitelistFields: [],
+                redirect_uri: izIAM.s.settings.redirect_uri,
+                post_logout_redirect_uri: izIAM.s.settings.post_logout_redirect_uri
+            }});
+            // and get back this new version of the config
+            izIAM.serviceConfiguration = await ServiceConfiguration.configurations.findOneAsync({ service: izIAM.C.Service });
+        }
+    },
 
-        izIAM.serviceConfiguration = serviceConfiguration;
-        izIAM.s.client = client;
-
-        return loginOptions;
+    // set the izIAM.s.settings global server variable
+    //  idempotent
+    async _getSettings(){
+        if( !izIAM.s.settings ){
+            const settings = EnvSettings.environmentServerSettings();
+            if( settings && settings.private ){
+                if( settings.private[izIAM.C.Service]  ){
+                    console.debug( 'set izIAM.s.settings from private server settings per environment' );
+                    izIAM.s.settings = settings.private[izIAM.C.Service];
+                } else {
+                    console.warn( 'unable to find \''+izIAM.C.Service+'\' section in private settings' );
+                }
+            }
+        }
     },
 
     // decode the 'state' parm, returning the original object
@@ -180,37 +125,119 @@ izIAM.s = {
         return Buffer.from( JSON.stringify( o )).toString( 'base64' );
     },
 
-    // try to discover the OpenID issuer
-    //  first run when envSettings are available
-    //  then retried each time a connection is requested
-    async tryDiscover(){
-        if( !izIAM.settings ){
-            const settings = EnvSettings.environmentServerSettings();
-            if( settings && settings.private && settings.private[izIAM.C.Service]  ){
-                console.debug( 'set izIAM service settings from private server settings per environment' );
-                izIAM.settings = settings.private[izIAM.C.Service];
-            }
+    // Call the izIAM change_password interaction URL for the current identity
+    async changeOptions( options={}, userId ){
+        // make sure we have read the settings from the server and got an Issuer
+        await this._getIssuer();
+        await this._getClient();
+
+        // build login options
+        const result = {};
+
+        // needed here (server side) in order to be embedded in the 'state' parm in order to be able to close the modal later
+        result.redirectUrl = options.redirect_uri || izIAM.s.settings.redirect_uri;
+        result.loginStyle = options.loginStyle || izIAM.s.settings.loginStyle;
+        result.popupOptions = options.popupOptions || izIAM.s.settings.popupOptions;
+
+        // Meteor.OAuth requires a credentialToken in the 'state'
+        result.credentialToken = Random.secret();
+
+        // store the code_verifier in the 'state' parameter which is brought back in the callback
+        result.code_verifier = generators.codeVerifier();
+        result.code_challenge = generators.codeChallenge( result.code_verifier );
+
+        let url = undefined;
+        this._getClient( options );
+        if( izIAM.s.client ){
+            url = izIAM.s.client.authorizationUrl({
+                scope: 'openid',
+                prompt: 'change_password',
+                code_challenge: result.code_challenge,
+                code_challenge_method: 'S256',
+                state: izIAM.s._stateEncode( result )
+            });
         }
-        //console.debug( 'izIAM.settings', izIAM.settings );
-        let promises = [];
-        if( izIAM.settings ){
-            if( !izIAM.Issuer ){
-                if( izIAM.settings.issuerUrl ){
-                    promises.push( Issuer.discover( izIAM.settings.issuerUrl )
-                        .then(( issuer ) => {
-                            console.debug( 'set izIAM.Issuer after successful '+izIAM.C.Service+' discovery' );
-                            izIAM.Issuer = issuer;
-                        })
-                        .catch(( e ) => {
-                            // may happen that the Issuer be temporarily unavailable - will have to retry later
-                            console.warn( e );
-                        }));
-                } else {
-                    console.warn( izIAM.C.Service, 'issuerUrl is not set' );
-                }
-            }
+        //console.debug( 'url', url );
+        result.url = url;
+
+        return result;
+    },
+
+    // Prepare the needed options for login flow
+    //  this is called as a method from the client requestCredential() function
+    // @param {Object} options: an optional options object passed from 'iziamLoginButton' component through its 'iziamOptions' component parameter
+    async loginOptions( options ){
+        //console.debug( 'loginOptions', options );
+        const debugSettings = false;
+        const debugIssuer = false;
+
+        // make sure we have read the settings from the server and got an Issuer
+        await this._getIssuer();
+        await this._getServiceConfiguration();
+
+        if( !izIAM.s.issuer ){
+            throw new Error( 'izIAM.s.issuer has not been discovered' );
         }
-        await Promise.allSettled( promises );
+        if( !izIAM.serviceConfiguration ){
+            throw new Error( 'izIAM.serviceConfiguration has not been built' );
+        }
+
+        // izIAM.s.settings are the settings read from the application 'private/config/server/environments.json'
+        debugSettings && console.debug( 'settings', izIAM.s.settings );
+
+        // izIAM.Issuer is the metadata automatically discovered from the Issuer
+        debugIssuer && console.debug( 'Issuer', izIAM.s.issuer );
+
+        // build login options
+        const result = {};
+        result.config = izIAM.serviceConfiguration;
+
+        // needed here (server side) in order to be embedded in the 'state' parm in order to be able to close the modal later
+        result.redirectUrl = options.redirect_uri || izIAM.s.settings.redirect_uri;
+        result.loginStyle = options.loginStyle || izIAM.s.settings.loginStyle;
+        result.popupOptions = options.popupOptions || izIAM.s.settings.popupOptions;
+
+        // Meteor.OAuth requires a credentialToken in the 'state'
+        result.credentialToken = Random.secret();
+
+        // store the code_verifier in the 'state' parameter which is brought back in the callback
+        result.code_verifier = generators.codeVerifier();
+        result.code_challenge = generators.codeChallenge( result.code_verifier );
+
+        let scopes = ( options.scopes && options.scopes.length ) ? options.scopes : (( izIAM.s.settings.scopes && izIAM.s.settings.scopes.length ) ? izIAM.s.settings.scopes : [] );
+        if( !scopes.includes( 'openid' )){
+            scopes.push( 'openid' );
+        }
+
+        let url = undefined;
+        this._getClient( options );
+        if( izIAM.s.client ){
+            url = izIAM.s.client.authorizationUrl({
+                scope: scopes.join( ' ' ),
+                resource: izIAM.s.settings.resources,
+                code_challenge: result.code_challenge,
+                code_challenge_method: 'S256',
+                state: izIAM.s._stateEncode( result )
+            });
+        }
+        //console.debug( 'url', url );
+        result.url = url;
+
+        return result;
+    },
+
+    // logout and terminate the user session
+    //  arguments are built on the server, but logout url is actually fetched from the client to be able to provide session cookies
+    async logoutOptions(){
+        let args = {};
+        await this._getClient();
+        if( izIAM.s.tokenSet ){
+            args.id_token_hint = izIAM.s.tokenSet.id_token;  // Retrieve the ID Token from the session
+        }
+        if( izIAM.s.settings?.post_logout_redirect_uri ){
+            args.post_logout_redirect_uri = izIAM.s.settings.post_logout_redirect_uri;
+        }
+        const endSessionUrl = izIAM.s.client ? izIAM.s.client.endSessionUrl( args ) : null;
+        return endSessionUrl ? { url: endSessionUrl } : null;
     }
 };
-//

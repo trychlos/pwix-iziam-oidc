@@ -46,7 +46,7 @@ OAuth.registerService( izIAM.C.Service, 2, null, function( query ){
         debugToken && console.log( 'validated ID Token claims %j', izIAM.s.tokenSet.claims());
 
         // access token introspection
-        if( debugToken && izIAM.Issuer?.introspection_endpoint ){
+        if( debugToken && izIAM.s.issuer?.introspection_endpoint ){
             promises.push( izIAM.s.client.introspect( izIAM.s.tokenSet.access_token ).then(( res ) => {
                 console.debug( 'access_token introspection:', res );
                 return res;
@@ -60,7 +60,7 @@ OAuth.registerService( izIAM.C.Service, 2, null, function( query ){
         return Promise.allSettled( promises );
     })
     .then(() => {
-        if( izIAM.Issuer?.userinfo_endpoint ){
+        if( izIAM.s.issuer?.userinfo_endpoint ){
             return izIAM.s.client.userinfo( izIAM.s.tokenSet.access_token ).then(( userinfo ) => {
                 debugToken && console.log( 'userinfo', userinfo );
 

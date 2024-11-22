@@ -25,7 +25,7 @@ izIAM.requestCredential = async ( options, credentialRequestCompleteCallback ) =
     // make sure options is a plain object
     options = options || {};
 
-    Meteor.callAsync( 'iziam.prepareLogin', options )
+    Meteor.callAsync( 'iziam.loginOptions', options )
         .then(( loginOptions ) => {
             if( !loginOptions ){
                 credentialRequestCompleteCallback && credentialRequestCompleteCallback( new ServiceConfiguration.ConfigError());
@@ -48,11 +48,11 @@ izIAM.requestCredential = async ( options, credentialRequestCompleteCallback ) =
 let prev = Meteor.userId();
 Tracker.autorun(() => {
     if( prev && !Meteor.userId()){
-        Meteor.callAsync( 'iziam.logout_args' ).then(( res ) => {
+        Meteor.callAsync( 'iziam.logoutOptions' ).then(( res ) => {
             if( res && res.url ){
                 window.location.href = res.url;
             }
-        })
+        });
     }
     prev = Meteor.userId();
 });
