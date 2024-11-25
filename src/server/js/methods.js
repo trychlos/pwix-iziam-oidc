@@ -3,6 +3,9 @@
  */
 
 Meteor.methods({
+    async 'iziam.accessToken'(){
+        return await izIAM.s.tokenSet?.access_token;
+    },
     async 'iziam.changeOptions'(){
         return await izIAM.s.changeOptions( this.userId );
     },
