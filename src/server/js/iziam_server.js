@@ -89,6 +89,6 @@ OAuth.registerService( izIAM.C.Service, 2, null, function( query ){
 });
 
 izIAM.retrieveCredential = function( credentialToken, credentialSecret ){
-    console.debug( 'izIAM.retrieveCredential()' );
+    //console.debug( 'izIAM.retrieveCredential()' );
     return OAuth.retrieveCredential( credentialToken, credentialSecret );
 };

@@ -31,7 +31,7 @@ izIAM.requestCredential = async ( options, credentialRequestCompleteCallback ) =
                 credentialRequestCompleteCallback && credentialRequestCompleteCallback( new ServiceConfiguration.ConfigError());
                 return;
             }
-            console.debug( 'calling OAuth.launchLogin() with loginOptions', loginOptions );
+            //console.debug( 'calling OAuth.launchLogin() with loginOptions', loginOptions );
             OAuth.launchLogin({
                 loginService: izIAM.C.Service,
                 loginStyle: loginOptions.loginStyle,

@@ -16,7 +16,6 @@ Package.onTest( function( api ){
     configure( api );
     api.use( 'tinytest' );
     api.use( 'pwix:iziam-oidc' );
-    api.use( 'pwix:iziam-oidc' );
     api.mainModule( 'test/js/index.js' );
 });
 
@@ -30,7 +29,6 @@ function configure( api ){
     api.use( 'oauth' );
     api.use( 'oauth2' );
     api.use( 'pwix:env-settings@2.1.0-rc' );
-    api.use( 'pwix:i18n@1.5.2' );
     api.use( 'random', 'client' );
     api.use( 'service-configuration' );
     api.use( 'tmeasday:check-npm-versions@2.0.0', 'server' );
