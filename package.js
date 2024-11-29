@@ -1,6 +1,6 @@
 Package.describe({
     name: 'pwix:iziam-oidc',
-    version: '1.0.0',
+    version: '1.0.1-rc',
     summary: 'izIAM OpenID Connect login flow',
     git: 'https://github.com/trychlos/pwix-iziam-oidc.git',
     documentation: 'README.md'
