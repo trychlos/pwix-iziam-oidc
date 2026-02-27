@@ -1,6 +1,6 @@
 Package.describe({
     name: 'pwix:iziam-oidc',
-    version: '1.0.1-rc',
+    version: '1.1.0-rc',
     summary: 'izIAM OpenID Connect login flow',
     git: 'https://github.com/trychlos/pwix-iziam-oidc.git',
     documentation: 'README.md'
@@ -29,6 +29,7 @@ function configure( api ){
     api.use( 'oauth' );
     api.use( 'oauth2' );
     api.use( 'pwix:env-settings@2.1.0-rc' );
+    api.use( 'pwix:logger@1.0.0-rc' );
     api.use( 'random', 'client' );
     api.use( 'service-configuration' );
     api.use( 'tmeasday:check-npm-versions@2.0.0', 'server' );

@@ -6,8 +6,11 @@ import _ from 'lodash';
 import { generators, Issuer } from 'openid-client';
 
 import { EnvSettings } from 'meteor/pwix:env-settings';
+import { Logger } from 'meteor/pwix:logger';
 import { Random } from 'meteor/random';
 import { ServiceConfiguration } from 'meteor/service-configuration';
+
+const logger = Logger.get();
 
 izIAM.s = {
 
@@ -49,15 +52,15 @@ izIAM.s = {
                     try {
                         izIAM.s.issuer = await Issuer.discover( izIAM.s.settings.issuerUrl );
                         if( izIAM.s.issuer ){
-                            console.debug( 'set izIAM.s.issuer after successful '+izIAM.C.Service+' discovery' );
+                            logger.log( 'izIAM._getIssuer() set izIAM.s.issuer after successful '+izIAM.C.Service+' discovery' );
                         }
                     }
                     catch( e ){
                         // may happen that the Issuer be temporarily unavailable - will have to retry later
-                        console.warn( e );
+                        logger.warn( e );
                     };
                 } else {
-                    console.warn( 'unable to find \'issuerUrl\' data in \''+izIAM.C.Service+'\' section from read private settings' );
+                    logger.warn( 'izIAM._getIssuer() unable to find \'issuerUrl\' data in \''+izIAM.C.Service+'\' section from read private settings' );
                 }
             }
         }
@@ -97,10 +100,10 @@ izIAM.s = {
             const settings = EnvSettings.environmentServerSettings();
             if( settings && settings.private ){
                 if( settings.private[izIAM.C.Service]  ){
-                    console.debug( 'set izIAM.s.settings from private server settings per environment' );
+                    logger.log( 'izIAM._getSettings() set izIAM.s.settings from private server settings per environment' );
                     izIAM.s.settings = settings.private[izIAM.C.Service];
                 } else {
-                    console.warn( 'unable to find \''+izIAM.C.Service+'\' section in private settings' );
+                    logger.warn( 'izIAM._getSettings() unable to find \''+izIAM.C.Service+'\' section in private settings' );
                 }
             }
         }
@@ -157,7 +160,7 @@ izIAM.s = {
                 state: izIAM.s._stateEncode( result )
             });
         }
-        //console.debug( 'url', url );
+        //logger.debug( 'izIAM.changeOptions()', url );
         result.url = url;
 
         return result;
@@ -167,7 +170,7 @@ izIAM.s = {
     //  this is called as a method from the client requestCredential() function
     // @param {Object} options: an optional options object passed from 'iziamLoginButton' component through its 'iziamOptions' component parameter
     async loginOptions( options ){
-        //console.debug( 'loginOptions', options );
+        //logger.debug( 'izIAM.loginOptions()', options );
         const debugSettings = false;
         const debugIssuer = false;
 
@@ -183,10 +186,10 @@ izIAM.s = {
         }
 
         // izIAM.s.settings are the settings read from the application 'private/config/server/environments.json'
-        debugSettings && console.debug( 'settings', izIAM.s.settings );
+        debugSettings && logger.debug( 'izIAM.loginOptions() settings', izIAM.s.settings );
 
         // izIAM.Issuer is the metadata automatically discovered from the Issuer
-        debugIssuer && console.debug( 'Issuer', izIAM.s.issuer );
+        debugIssuer && logger.debug( 'izIAM.loginOptions() Issuer', izIAM.s.issuer );
 
         // build login options
         const result = {};
@@ -220,7 +223,7 @@ izIAM.s = {
                 state: izIAM.s._stateEncode( result )
             });
         }
-        //console.debug( 'url', url );
+        //logger.debug( 'izIAM.loginOptions()', url );
         result.url = url;
 
         return result;

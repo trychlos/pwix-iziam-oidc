@@ -4,6 +4,10 @@
 
 import _ from 'lodash';
 
+import { Logger } from 'meteor/pwix:logger';
+
+const logger = Logger.get();
+
 // query: {
 //  code: 'QTVKAjLBsabX9hlHZS7xUFATAypUOw965oGmkEMWzhu',
 //  state: 'eyJsb2dpblN0eWxlIjoicG9wdXAiLCJ2ZXJpZmllciI6IkpFUW16akotVVd3U2VSV2lEc1BOVDhpVC1KOEVLTkhTNUk1aXJWVE5LZTgiLCJyZWRpcmVjdCI6Imh0dHBzOi8vZGV2ZWwudHJ5Y2hsb3Mub3JnL19vYXV0aC9peklBTSIsImNyZWRlbnRpYWxUb2tlbiI6IlBTTVY4a0Y3NUlzcGxfTTRmZlhxeW9OUGM2ZWp0RVpJengxaHU4YUFudjQifQ==',
@@ -19,7 +23,7 @@ OAuth.registerService( izIAM.C.Service, 2, null, function( query ){
 
     // get the authorization code in query.code
     const options = izIAM.s._stateDecode( query.state );
-    debugQuery && console.debug( 'query', query, 'options', options );
+    debugQuery && logger.debug( 'OAuth.registerService() query', query, 'options', options );
 
     return izIAM.s.client.callback( options.redirect, query, {
         state: query.state,
@@ -35,7 +39,7 @@ OAuth.registerService( izIAM.C.Service, 2, null, function( query ){
         //  id_token:
         //  scope: 'email profile'  aka requested scopes, without (eaten) 'openid'
         //  token_type: 'Bearer'
-        debugToken && console.log( 'received and validated tokens %j', izIAM.s.tokenSet );
+        debugToken && logger.debug( 'OAuth.registerService() received and validated tokens %j', izIAM.s.tokenSet );
         // claims is an object
         //  sub: <login>
         //  at_hash: ?
@@ -43,12 +47,12 @@ OAuth.registerService( izIAM.C.Service, 2, null, function( query ){
         //  exp: <timestamp>
         //  iat: <timestamp>
         //  iss: <OP Issuer>
-        debugToken && console.log( 'validated ID Token claims %j', izIAM.s.tokenSet.claims());
+        debugToken && logger.debug( 'OAuth.registerService() validated ID Token claims %j', izIAM.s.tokenSet.claims());
 
         // access token introspection
         if( debugToken && izIAM.s.issuer?.introspection_endpoint ){
             promises.push( izIAM.s.client.introspect( izIAM.s.tokenSet.access_token ).then(( res ) => {
-                console.debug( 'access_token introspection:', res );
+                logger.debug( 'OAuth.registerService() access_token introspection:', res );
                 return res;
             }));
         }
@@ -62,7 +66,7 @@ OAuth.registerService( izIAM.C.Service, 2, null, function( query ){
     .then(() => {
         if( izIAM.s.issuer?.userinfo_endpoint ){
             return izIAM.s.client.userinfo( izIAM.s.tokenSet.access_token ).then(( userinfo ) => {
-                debugToken && console.log( 'userinfo', userinfo );
+                debugToken && logger.debug( 'OAuth.registerService() userinfo', userinfo );
 
                 let serviceData = userinfo;
                 serviceData.id = userinfo.sub;
@@ -75,20 +79,20 @@ OAuth.registerService( izIAM.C.Service, 2, null, function( query ){
                     options: { profile: {}}
                 };
 
-                debugToken && console.debug( 'returning', o );
+                debugToken && logger.debug( 'OAuth.registerService() returning', o );
                 return o;
             });
         } else {
-            console.warn( 'userinfo_endpoint is not set' );
+            logger.warn( 'OAuth.registerService() userinfo_endpoint is not set' );
             return null;
         }
     })
     .catch(( e ) => {
-        console.error( e );
+        logger.error( e );
     });
 });
 
 izIAM.retrieveCredential = function( credentialToken, credentialSecret ){
-    //console.debug( 'izIAM.retrieveCredential()' );
+    //logger.debug( 'izIAM.retrieveCredential()' );
     return OAuth.retrieveCredential( credentialToken, credentialSecret );
 };

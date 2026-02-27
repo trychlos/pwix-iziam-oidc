@@ -4,6 +4,8 @@
 
 A Meteor package which manages the OIDC connection against izIAM Identity and Access Manager.
 
+This package is expected to be implemented by any application which would take advantage of izIAM authentication features.
+
 ## Provides
 
 ### `izIAM`
