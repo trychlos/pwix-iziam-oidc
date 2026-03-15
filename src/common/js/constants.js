@@ -2,7 +2,7 @@
  * pwix:iziam-oidc/src/common/js/constants.js
  */
 
-izIAM.C = {
+iziamOIDC.C = {
     Service: 'iziam',
 
     // verbosity levels

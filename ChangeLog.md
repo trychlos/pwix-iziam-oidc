@@ -7,6 +7,8 @@
 Release date: 
 
 - Use pwix:logger universal logger, thus bumping minor candidate version number
+- izIAM global is renamed to iziamOIDC
+- Make sure methods and publications are prefixed with a full namespace
 
 ### 1.0.0
 

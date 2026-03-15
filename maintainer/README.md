@@ -19,10 +19,10 @@
 ```
  package                client                                                      server
  ---------------------  ----------------------------------------------------------  ----------------------------------------------------------
- iziam-oidc             export izIAM global                                         export izIAM global
- accounts-iziam         call Accounts.oauth.registerService( izIAM.C.Service );     call Accounts.oauth.registerService( izIAM.C.Service );
+ iziam-oidc             export iziamOIDC global                                         export iziamOIDC global
+ accounts-iziam         call Accounts.oauth.registerService( iziamOIDC.C.Service );     call Accounts.oauth.registerService( iziamOIDC.C.Service );
  accounts-iziam         define Meteor.loginWithIzIAM() function                     call Accounts.addAutopublishFields({...});
- iziam-oidc                                                                         call OAuth.registerService( izIAM.C.Service )
+ iziam-oidc                                                                         call OAuth.registerService( iziamOIDC.C.Service )
 ```
 
 ### At startup time
@@ -31,16 +31,16 @@
  package                client                                                      server
  --------------------   ----------------------------------------------------------  ----------------------------------------------------------
  iziam-oidc                                                                         load service configuration from server settings
- iziam-oidc                                                                         set izIAM.Issuer after successful service discovery
+ iziam-oidc                                                                         set iziamOIDC.Issuer after successful service discovery
 ```
 
-### When the user cliks on `login with izIAM`
+### When the user cliks on `login with iziamOIDC`
 
 ```
  package                            client                                                      server
  --------------------------------   ----------------------------------------------------------  ----------------------------------------------------------
  accounts-iziam:click'              call to Meteor.loginWithIzIAM()
- accounts-iziam:loginWithIzIAM()    call izIAM.requestCredential()
+ accounts-iziam:loginWithIzIAM()    call iziamOIDC.requestCredential()
  iziam-oidc:requestCredential()     call 'loginOptions' method
  iziam-oidc:loginOptions                                                                        build and return loginOptions for OIDC Provider (OP)
  iziam-oidc:requestCredential()     call OAuth.launchLogin( loginOptions )

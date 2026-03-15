@@ -3,16 +3,16 @@
  */
 
 Meteor.methods({
-    async 'iziam.accessToken'(){
-        return await izIAM.s.tokenSet?.access_token;
+    async 'pwix.iziamOIDC.m.accessToken'(){
+        return await iziamOIDC.s.tokenSet?.access_token;
     },
-    async 'iziam.changeOptions'(){
-        return await izIAM.s.changeOptions( this.userId );
+    async 'pwix.iziamOIDC.m.changeOptions'(){
+        return await iziamOIDC.s.changeOptions( this.userId );
     },
-    async 'iziam.loginOptions'( options ){
-        return await izIAM.s.loginOptions( options );
+    async 'pwix.iziamOIDC.m.loginOptions'( options ){
+        return await iziamOIDC.s.loginOptions( options );
     },
-    async 'iziam.logoutOptions'(){
-        return await izIAM.s.logoutOptions();
+    async 'pwix.iziamOIDC.m.logoutOptions'(){
+        return await iziamOIDC.s.logoutOptions();
     },
 });

@@ -6,15 +6,15 @@ import { OAuth } from 'meteor/oauth';
 import { ServiceConfiguration } from 'meteor/service-configuration';
 import { Tracker } from 'meteor/tracker';
 
-// Request izIAM credentials for the user
+// Request iziamOIDC credentials for the user
 // @param options {optional}
 //  - loginStyle, 'popup' or 'redirect', defaulting to the ServiceConfiguration value (which itself has been read from settings per environment)
 // @param credentialRequestCompleteCallback {Function} Callback function to call on
 //   completion. Takes one argument, credentialToken on success, or Error on
 //   error.
 // Note: the requestCredential() function is called by accounts-iziam, and is not expected to return something.
-izIAM.requestCredential = async ( options, credentialRequestCompleteCallback ) => {
-    //console.debug( 'entering izIAM.requestCredential() with options', options );
+iziamOIDC.requestCredential = async ( options, credentialRequestCompleteCallback ) => {
+    //console.debug( 'entering iziamOIDC.requestCredential() with options', options );
 
     // support both (options, callback) and (callback).
     if( !credentialRequestCompleteCallback && typeof options === 'function' ){
@@ -25,7 +25,7 @@ izIAM.requestCredential = async ( options, credentialRequestCompleteCallback ) =
     // make sure options is a plain object
     options = options || {};
 
-    Meteor.callAsync( 'iziam.loginOptions', options )
+    Meteor.callAsync( 'pwix.iziamOIDC.m.loginOptions', options )
         .then(( loginOptions ) => {
             if( !loginOptions ){
                 credentialRequestCompleteCallback && credentialRequestCompleteCallback( new ServiceConfiguration.ConfigError());
@@ -33,7 +33,7 @@ izIAM.requestCredential = async ( options, credentialRequestCompleteCallback ) =
             }
             //console.debug( 'calling OAuth.launchLogin() with loginOptions', loginOptions );
             OAuth.launchLogin({
-                loginService: izIAM.C.Service,
+                loginService: iziamOIDC.C.Service,
                 loginStyle: loginOptions.loginStyle,
                 loginUrl: loginOptions.url,
                 credentialToken: loginOptions.credentialToken,
@@ -48,7 +48,7 @@ izIAM.requestCredential = async ( options, credentialRequestCompleteCallback ) =
 let prev = Meteor.userId();
 Tracker.autorun(() => {
     if( prev && !Meteor.userId()){
-        Meteor.callAsync( 'iziam.logoutOptions' ).then(( res ) => {
+        Meteor.callAsync( 'pwix.iziamOIDC.m.logoutOptions' ).then(( res ) => {
             if( res && res.url ){
                 window.location.href = res.url;
             }

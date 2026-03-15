@@ -16,22 +16,22 @@ const logger = Logger.get();
 // OAuth request handler
 //  query.code is the received authorization code
 
-OAuth.registerService( izIAM.C.Service, 2, null, function( query ){
+OAuth.registerService( iziamOIDC.C.Service, 2, null, function( query ){
 
     const debugQuery = false;
     const debugToken = true;
 
     // get the authorization code in query.code
-    const options = izIAM.s._stateDecode( query.state );
+    const options = iziamOIDC.s._stateDecode( query.state );
     debugQuery && logger.debug( 'OAuth.registerService() query', query, 'options', options );
 
-    return izIAM.s.client.callback( options.redirect, query, {
+    return iziamOIDC.s.client.callback( options.redirect, query, {
         state: query.state,
         code_verifier: options.verifier,
         response_type: 'code'
     })
     .then(( tks ) => {
-        izIAM.s.tokenSet = tks;
+        iziamOIDC.s.tokenSet = tks;
         let promises = [];
         // get an access code with 'openid' scope as an object:
         //  access_token:
@@ -39,7 +39,7 @@ OAuth.registerService( izIAM.C.Service, 2, null, function( query ){
         //  id_token:
         //  scope: 'email profile'  aka requested scopes, without (eaten) 'openid'
         //  token_type: 'Bearer'
-        debugToken && logger.debug( 'OAuth.registerService() received and validated tokens %j', izIAM.s.tokenSet );
+        debugToken && logger.debug( 'OAuth.registerService() received and validated tokens %j', iziamOIDC.s.tokenSet );
         // claims is an object
         //  sub: <login>
         //  at_hash: ?
@@ -47,11 +47,11 @@ OAuth.registerService( izIAM.C.Service, 2, null, function( query ){
         //  exp: <timestamp>
         //  iat: <timestamp>
         //  iss: <OP Issuer>
-        debugToken && logger.debug( 'OAuth.registerService() validated ID Token claims %j', izIAM.s.tokenSet.claims());
+        debugToken && logger.debug( 'OAuth.registerService() validated ID Token claims %j', iziamOIDC.s.tokenSet.claims());
 
         // access token introspection
-        if( debugToken && izIAM.s.issuer?.introspection_endpoint ){
-            promises.push( izIAM.s.client.introspect( izIAM.s.tokenSet.access_token ).then(( res ) => {
+        if( debugToken && iziamOIDC.s.issuer?.introspection_endpoint ){
+            promises.push( iziamOIDC.s.client.introspect( iziamOIDC.s.tokenSet.access_token ).then(( res ) => {
                 logger.debug( 'OAuth.registerService() access_token introspection:', res );
                 return res;
             }));
@@ -64,15 +64,15 @@ OAuth.registerService( izIAM.C.Service, 2, null, function( query ){
         return Promise.allSettled( promises );
     })
     .then(() => {
-        if( izIAM.s.issuer?.userinfo_endpoint ){
-            return izIAM.s.client.userinfo( izIAM.s.tokenSet.access_token ).then(( userinfo ) => {
+        if( iziamOIDC.s.issuer?.userinfo_endpoint ){
+            return iziamOIDC.s.client.userinfo( iziamOIDC.s.tokenSet.access_token ).then(( userinfo ) => {
                 debugToken && logger.debug( 'OAuth.registerService() userinfo', userinfo );
 
                 let serviceData = userinfo;
                 serviceData.id = userinfo.sub;
-                serviceData.accessToken = izIAM.s.tokenSet.access_token;
-                serviceData.refreshToken = izIAM.s.tokenSet.refresh_token;
-                serviceData.expiresAt = izIAM.s.tokenSet.expires_at;
+                serviceData.accessToken = iziamOIDC.s.tokenSet.access_token;
+                serviceData.refreshToken = iziamOIDC.s.tokenSet.refresh_token;
+                serviceData.expiresAt = iziamOIDC.s.tokenSet.expires_at;
 
                 const o = {
                     serviceData: serviceData,
@@ -92,7 +92,7 @@ OAuth.registerService( izIAM.C.Service, 2, null, function( query ){
     });
 });
 
-izIAM.retrieveCredential = function( credentialToken, credentialSecret ){
-    //logger.debug( 'izIAM.retrieveCredential()' );
+iziamOIDC.retrieveCredential = function( credentialToken, credentialSecret ){
+    //logger.debug( 'iziamOIDC.retrieveCredential()' );
     return OAuth.retrieveCredential( credentialToken, credentialSecret );
 };

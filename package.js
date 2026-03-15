@@ -22,7 +22,7 @@ Package.onTest( function( api ){
 function configure( api ){
     api.versionsFrom([ '2.9.0', '3.0-rc.1' ]);
     api.export([
-        'izIAM'
+        'iziamOIDC'
     ]);
     api.use( 'ecmascript' );
     api.use( 'fetch' );
