@@ -97,7 +97,7 @@ iziamOIDC.s = {
     //  idempotent
     async _getSettings(){
         if( !iziamOIDC.s.settings ){
-            const settings = EnvSettings.environmentServerSettings();
+            const settings = await EnvSettings.s.environmentServerSettings();
             if( settings && settings.private ){
                 if( settings.private[iziamOIDC.C.Service]  ){
                     logger.log( 'iziamOIDC._getSettings() set iziamOIDC.s.settings from private server settings per environment' );
