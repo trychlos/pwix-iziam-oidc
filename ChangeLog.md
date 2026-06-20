@@ -9,6 +9,7 @@ Release date:
 - Use pwix:logger universal logger, thus bumping minor candidate version number
 - izIAM global is renamed to iziamOIDC
 - Make sure methods and publications are prefixed with a full namespace
+- Bump to openid-client v6 and jose v6, polyfilling mapped exports
 
 ### 1.0.0
 

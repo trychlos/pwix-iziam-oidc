@@ -1,3 +1,33 @@
+// openid-client uses jose which describes its exports as virtuals, i.e. exports are mapped from files to other paths
+// Unfortunately, MeteorJS doesn't know how to handle these mapped exports when used from MeteorJS packages!
+// So have to shim the needed exports to physical files (list of openid-client v6.8.4)
+// https://claude.ai/chat/58ad8a61-cefb-46b9-aae3-30458f0f066b
+
+const fs = Npm.require( 'fs' );
+const path = Npm.require( 'path' );
+
+(function patchJoseExports(){
+    try {
+        // process.cwd() is the app root when Meteor invokes package.js
+        const joseRoot = path.join( process.cwd(), 'node_modules', 'jose' );
+        if( !fs.existsSync( joseRoot )) return; // app hasn't installed jose yet — nothing to patch
+
+        const decryptDir = path.join( joseRoot, 'jwe', 'compact' );
+        const decryptFile = path.join( decryptDir, 'decrypt.js' );
+        if( !fs.existsSync( decryptFile )){
+            fs.mkdirSync( decryptDir, { recursive: true });
+            fs.writeFileSync( decryptFile, `export * from '../../dist/webapi/jwe/compact/decrypt.js';\n` );
+        }
+
+        const errorsFile = path.join( joseRoot, 'errors.js' );
+        if( !fs.existsSync( errorsFile )){
+            fs.writeFileSync( errorsFile, `export * from './dist/webapi/util/errors.js';\n` );
+        }
+    } catch (e) {
+        console.warn( '[pwix:iziam-oidc] could not patch jose exports shim:', e.message );
+    }
+})();
+
 Package.describe({
     name: 'pwix:iziam-oidc',
     version: '1.1.0-rc',
