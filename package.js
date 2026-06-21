@@ -58,8 +58,9 @@ function configure( api ){
     api.use( 'fetch' );
     api.use( 'oauth' );
     api.use( 'oauth2' );
-    api.use( 'pwix:env-settings@2.1.0-rc' );
-    api.use( 'pwix:logger@1.0.0-rc' );
+    api.use( 'pwix:env-settings@2.1.0' );
+    api.use( 'pwix:env-settings-ext@1.3.0' );
+    api.use( 'pwix:logger@1.0.0' );
     api.use( 'random', 'client' );
     api.use( 'service-configuration' );
     api.use( 'tmeasday:check-npm-versions@2.0.0', 'server' );

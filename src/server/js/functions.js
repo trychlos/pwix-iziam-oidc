@@ -3,7 +3,8 @@
  */
 
 import _ from 'lodash';
-import { generators, Issuer } from 'openid-client';
+import * as client from 'openid-client';
+import { url } from 'node:url';
 
 import { EnvSettings } from 'meteor/pwix:env-settings';
 import { Logger } from 'meteor/pwix:logger';
@@ -14,98 +15,45 @@ const logger = Logger.get();
 
 iziamOIDC.s = {
 
-    // set the iziamOIDC.s.client global server variable
-    //  requires iziamOIDC.s.settings
-    //  idempotent
-    async _getClient( opts={} ){
-        if( !iziamOIDC.s.client ){
-            this._getIssuer();
-            if( iziamOIDC.s.issuer ){
-                const auth_method = opts.token_endpoint_auth_method || iziamOIDC.s.settings.token_endpoint_auth_method || 'client_secret_basic';
-                const parms = {
-                    client_id: opts.client_id || iziamOIDC.s.settings.client_id,
-                    redirect_uris: [ opts.redirect_uri || iziamOIDC.s.settings.redirect_uri ],
-                    response_types: [ 'code' ],
-                    token_endpoint_auth_method: auth_method
-                };
-                if( auth_method !== 'none' ){
-                    const secret = opts.client_secret || iziamOIDC.s.settings.client_secret;
-                    if( !secret ){
-                        throw new Error( 'client secret is not set though required by authentication method not being none' );
-                    } else {
-                        parms.client_secret = secret;
-                    }
-                }
-                iziamOIDC.s.client = new iziamOIDC.s.issuer.Client( parms );
-            }
-        }
-    },
-
-    // set the iziamOIDC.s.issuer global server variable
-    //  requires iziamOIDC.s.settings
-    //  idempotent
-    async _getIssuer(){
-        if( !iziamOIDC.s.issuer ){
-            this._getSettings();
-            if( iziamOIDC.s.settings ){
-                if( iziamOIDC.s.settings.issuerUrl ){
-                    try {
-                        iziamOIDC.s.issuer = await Issuer.discover( iziamOIDC.s.settings.issuerUrl );
-                        if( iziamOIDC.s.issuer ){
-                            logger.log( 'iziamOIDC._getIssuer() set iziamOIDC.s.issuer after successful '+iziamOIDC.C.Service+' discovery' );
-                        }
-                    }
-                    catch( e ){
-                        // may happen that the Issuer be temporarily unavailable - will have to retry later
-                        logger.warn( e );
-                    };
-                } else {
-                    logger.warn( 'iziamOIDC._getIssuer() unable to find \'issuerUrl\' data in \''+iziamOIDC.C.Service+'\' section from read private settings' );
-                }
-            }
-        }
-    },
-
-    // setup the iziamOIDC.serviceConfiguration global server variable
-    //  + make sure the ServiceConfiguraton Meteor collection ('meteor_accounts_loginServiceConfiguration') is up to date
-    //  requires iziamOIDC.s.settings
-    async _getServiceConfiguration(){
-        this._getIssuer();
-        if( iziamOIDC.s.issuer ){
-            // remove the previous version
-            await ServiceConfiguration.configurations.removeAsync({ service: iziamOIDC.C.Service });
-            // make sure service configuration has last version from settings
-            await ServiceConfiguration.configurations.upsertAsync({ service: iziamOIDC.C.Service }, { $set: {
-                loginStyle: iziamOIDC.s.settings.loginStyle || 'popup',
-                clientId: iziamOIDC.s.settings.client_id,
-                clientSecret: iziamOIDC.s.settings.client_secret,
-                serverUrl: iziamOIDC.s.settings.issuerUrl,
-                resource: iziamOIDC.s.settings.resource,
-                authorizationEndpoint: iziamOIDC.s.issuer.authorization_endpoint.substring( iziamOIDC.s.settings.issuerUrl.length ),
-                tokenEndpoint: iziamOIDC.s.issuer.token_endpoint.substring( iziamOIDC.s.settings.issuerUrl.length ),
-                userinfoEndpoint: iziamOIDC.s.issuer.userinfo_endpoint.substring( iziamOIDC.s.settings.issuerUrl.length ),
-                idTokenWhitelistFields: [],
-                redirect_uri: iziamOIDC.s.settings.redirect_uri,
-                post_logout_redirect_uri: iziamOIDC.s.settings.post_logout_redirect_uri
-            }});
-            // and get back this new version of the config
-            iziamOIDC.serviceConfiguration = await ServiceConfiguration.configurations.findOneAsync({ service: iziamOIDC.C.Service });
-        }
-    },
-
-    // set the iziamOIDC.s.settings global server variable
+    // set the iziamOIDC.s.settings global server variable: the private 'iziam' app settings for the environment
     //  idempotent
     async _getSettings(){
         if( !iziamOIDC.s.settings ){
             const settings = await EnvSettings.s.environmentServerSettings();
-            if( settings && settings.private ){
-                if( settings.private[iziamOIDC.C.Service]  ){
-                    logger.log( 'iziamOIDC._getSettings() set iziamOIDC.s.settings from private server settings per environment' );
-                    iziamOIDC.s.settings = settings.private[iziamOIDC.C.Service];
+            if( settings?.settings?.private ){
+                if( settings.settings.private[iziamOIDC.C.Service]  ){
+                    logger.log( 'iziamOIDC.s._getSettings() set iziamOIDC.s.settings from private server settings per environment' );
+                    iziamOIDC.s.settings = settings.settings.private[iziamOIDC.C.Service];
                 } else {
-                    logger.warn( 'iziamOIDC._getSettings() unable to find \''+iziamOIDC.C.Service+'\' section in private settings' );
+                    logger.warn( 'iziamOIDC.s._getSettings() sectioon \''+iziamOIDC.C.Service+'\' not found in private settings' );
                 }
             }
+        }
+    },
+
+    // set the iziamOIDC.s.client global server variable: the client Configuration
+    //  the passed-in 'parms' parameter is the current state of the built parameters
+    //  includes notably config, code_verifier and so on
+    //  idempotent
+    async _initClientConfig( parms ){
+        if( !iziamOIDC.s.client ){
+            iziamOIDC.s.client = await client.discovery( new URL( parms.config.issuerUrl ), parms.config.client_id, parms.config.client_secret );
+        }
+    },
+
+    // setup the iziamOIDC.serviceConfiguration global server variable: the login service 'iziam' configuration
+    //  + make sure the ServiceConfiguraton Meteor collection ('meteor_accounts_loginServiceConfiguration') is up to date
+    //  requires iziamOIDC.s.settings
+    async _initServiceConfiguration(){
+        await this._getSettings();
+        logger.debug( 'iziamOIDC.s._initServiceConfiguration() settings', iziamOIDC.s.settings );
+        if( iziamOIDC.s.settings ){
+            // remove the previous version
+            await ServiceConfiguration.configurations.removeAsync({ service: iziamOIDC.C.Service });
+            // make sure service configuration has last version from settings
+            await ServiceConfiguration.configurations.upsertAsync({ service: iziamOIDC.C.Service }, { $set: iziamOIDC.s.settings });
+            // and get back this new version of the config
+            iziamOIDC.s.serviceConfiguration = await ServiceConfiguration.configurations.findOneAsync({ service: iziamOIDC.C.Service });
         }
     },
 
@@ -169,43 +117,40 @@ iziamOIDC.s = {
     // Prepare the needed options for login flow
     //  this is called as a method from the client requestCredential() function
     // @param {Object} options: an optional options object passed from 'iziamLoginButton' component through its 'iziamOptions' component parameter
+    //  it superseded the ServiceConfiguration initialized from the app settings
+
     async loginOptions( options ){
-        //logger.debug( 'iziamOIDC.loginOptions()', options );
+        //logger.debug( 'iziamOIDC.s.oginOptions()', options );
         const debugSettings = false;
-        const debugIssuer = false;
 
-        // make sure we have read the settings from the server and got an Issuer
-        await this._getIssuer();
-        await this._getServiceConfiguration();
-
-        if( !iziamOIDC.s.issuer ){
-            throw new Error( 'iziamOIDC.s.issuer has not been discovered' );
-        }
-        if( !iziamOIDC.serviceConfiguration ){
-            throw new Error( 'iziamOIDC.serviceConfiguration has not been built' );
+        // read settings, and initialize the ServiceConfiguration service
+        await this._initServiceConfiguration();
+        if( !iziamOIDC.s.serviceConfiguration ){
+            throw new Error( 'iziamOIDC.s.serviceConfiguration has not been initialized' );
         }
 
-        // iziamOIDC.s.settings are the settings read from the application 'private/config/server/environments.json'
-        debugSettings && logger.debug( 'iziamOIDC.loginOptions() settings', iziamOIDC.s.settings );
-
-        // iziamOIDC.Issuer is the metadata automatically discovered from the Issuer
-        debugIssuer && logger.debug( 'iziamOIDC.loginOptions() Issuer', iziamOIDC.s.issuer );
-
-        // build login options
+        // build login options to be returned to be passed to OAuth.launchLogin()
         const result = {};
-        result.config = iziamOIDC.serviceConfiguration;
+        result.config = { ...iziamOIDC.s.serviceConfiguration };
+
+        // see https://docs.meteor.com/api/accounts.html#popup-vs-redirect-flow
+        //  - loginStyle should default to 'popup' in MeteorJS applications (this is expected to be set in app settings)
+        //  - loginStyle should be rather 'redirect' in mobile apps using UIWebViews - This is why loginWithIziam is passwed with a 'mobileHint'
+        if( options.mobileHint ){
+            options.loginStyle = 'redirect';
+        }
 
         // needed here (server side) in order to be embedded in the 'state' parm in order to be able to close the modal later
-        result.redirectUrl = options.redirect_uri || iziamOIDC.s.settings.redirect_uri;
-        result.loginStyle = options.loginStyle || iziamOIDC.s.settings.loginStyle;
-        result.popupOptions = options.popupOptions || iziamOIDC.s.settings.popupOptions;
+        result.loginStyle = options.loginStyle || iziamOIDC.s.serviceConfiguration.loginStyle; // in state
+        result.popupOptions = options.popupOptions || iziamOIDC.s.serviceConfiguration.popupOptions;
+        result.redirectUrl = options.redirect_uri || iziamOIDC.s.serviceConfiguration.redirect_uri; // in state
 
         // Meteor.OAuth requires a credentialToken in the 'state'
-        result.credentialToken = Random.secret();
+        result.credentialToken = Random.secret( 32 );
 
         // store the code_verifier in the 'state' parameter which is brought back in the callback
-        result.code_verifier = generators.codeVerifier();
-        result.code_challenge = generators.codeChallenge( result.code_verifier );
+        result.code_verifier = client.randomPKCECodeVerifier(); // in state
+        result.code_challenge = await client.calculatePKCECodeChallenge( result.code_verifier );
 
         let scopes = ( options.scopes && options.scopes.length ) ? options.scopes : (( iziamOIDC.s.settings.scopes && iziamOIDC.s.settings.scopes.length ) ? iziamOIDC.s.settings.scopes : [] );
         if( !scopes.includes( 'openid' )){
@@ -213,9 +158,9 @@ iziamOIDC.s = {
         }
 
         let url = undefined;
-        this._getClient( options );
+        await this._initClientConfig( result );
         if( iziamOIDC.s.client ){
-            url = iziamOIDC.s.client.authorizationUrl({
+            url = client.buildAuthorizationUrl( iziamOIDC.s.client, {
                 scope: scopes.join( ' ' ),
                 resource: iziamOIDC.s.settings.resources,
                 code_challenge: result.code_challenge,
@@ -233,7 +178,7 @@ iziamOIDC.s = {
     //  arguments are built on the server, but logout url is actually fetched from the client to be able to provide session cookies
     async logoutOptions(){
         let args = {};
-        await this._getClient();
+        await this._initClientConfig();
         if( iziamOIDC.s.tokenSet ){
             args.id_token_hint = iziamOIDC.s.tokenSet.id_token;  // Retrieve the ID Token from the session
         }

@@ -10,9 +10,9 @@ import { Tracker } from 'meteor/tracker';
 // @param options {optional}
 //  - loginStyle, 'popup' or 'redirect', defaulting to the ServiceConfiguration value (which itself has been read from settings per environment)
 // @param credentialRequestCompleteCallback {Function} Callback function to call on
-//   completion. Takes one argument, credentialToken on success, or Error on
-//   error.
-// Note: the requestCredential() function is called by accounts-iziam, and is not expected to return something.
+//   completion. Takes one argument, credentialToken on success, or Error on error.
+// Note: the requestCredential() function is called from accounts-iziam client through 'loginWithIziam()' function, and is not expected to return something.
+
 iziamOIDC.requestCredential = async ( options, credentialRequestCompleteCallback ) => {
     //console.debug( 'entering iziamOIDC.requestCredential() with options', options );
 
