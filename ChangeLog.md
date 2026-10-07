@@ -2,9 +2,9 @@
 
 ## ChangeLog
 
-### 1.1.0-rc
+### 1.1.0
 
-Release date: 
+Release date: 2026-10- 7
 
 - Obsolete the package in the profit of pwix:iziam-oauth
 
@@ -16,4 +16,4 @@ Release date: 2024-11-29
 
 ---
 P. Wieser
-- Last updated on 2024, Nov. 29th
+- Last updated on 2026, Oct. 7th
