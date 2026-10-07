@@ -30,7 +30,7 @@ const path = Npm.require( 'path' );
 
 Package.describe({
     name: 'pwix:iziam-oidc',
-    version: '1.1.0-rc',
+    version: '1.1.0',
     summary: 'izIAM OpenID Connect login flow',
     git: 'https://github.com/trychlos/pwix-iziam-oidc.git',
     documentation: 'README.md'
