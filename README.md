@@ -1,5 +1,7 @@
 # pwix:iziam-oidc
 
+__THIS PACKAGE IS OBSOLETE AS OF 2026-10-01 IN THE PROFIT OF [pwix:iziam-oauth](https://github.com/trychlos/pwix-iziam-oauth).__
+
 ## What is it ?
 
 A Meteor package which manages the OIDC connection against izIAM Identity and Access Manager.

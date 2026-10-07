@@ -6,11 +6,7 @@
 
 Release date: 
 
-- Use pwix:logger universal logger, thus bumping minor candidate version number
-- izIAM global is renamed to iziamOIDC
-- Make sure methods and publications are prefixed with a full namespace
-- Bump to openid-client v6 and jose v6, polyfilling mapped exports
-- Add missing pwix:env-settings-ext v1.3 dependency
+- Obsolete the package in the profit of pwix:iziam-oauth
 
 ### 1.0.0
 
