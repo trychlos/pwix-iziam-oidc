@@ -44,10 +44,10 @@ Starting with v 1.0.0, and in accordance with advices from [the Meteor Guide](ht
 
 Instead we check npm versions of installed packages at runtime, on server startup, in development environment.
 
-Dependencies as of v 1.0.0:
+Dependencies as of v 1.1.0:
 ```
     'lodash': '^4.17.0',
-    'openid-client': '^5.6.1'
+    'openid-client': '^5.6.1 || ^6.8.4'
 ```
 
 Each of these dependencies should be installed at application level:
@@ -65,4 +65,4 @@ None at the moment.
 
 ---
 P. Wieser
-- Last updated on 2024, Nov. 29th
+- Last updated on 2026, Oct. 7th
